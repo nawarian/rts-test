@@ -8,7 +8,7 @@ use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Color;
 use RTS\Scene\Scene;
 
-final class Game
+final class GameLoop
 {
     private const GAME_TITLE = 'RTS PoC';
 

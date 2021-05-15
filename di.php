@@ -5,7 +5,7 @@ declare(strict_types=1);
 use DI\ContainerBuilder;
 use Nawarian\Raylib\{Raylib, RaylibFactory};
 use Psr\Container\ContainerInterface;
-use RTS\Game;
+use RTS\GameLoop;
 use RTS\Grid\Grid2D;
 use RTS\Map;
 use RTS\Scene\TestScene;
@@ -14,10 +14,10 @@ use function DI\autowire;
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions([
-    Game::class => function (ContainerInterface $c) {
+    GameLoop::class => function (ContainerInterface $c) {
         $raylib = $c->get(Raylib::class);
 
-        return new Game($raylib);
+        return new GameLoop($raylib);
     },
 
     TestScene::class => autowire(TestScene::class),
