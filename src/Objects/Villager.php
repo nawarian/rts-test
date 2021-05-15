@@ -9,36 +9,33 @@ use Nawarian\Raylib\Types\Camera2D;
 use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
+use RTS\GameState;
 use RTS\Grid\Cell;
-use RTS\Grid\Grid2D;
 
 class Villager extends Unit
 {
     private const WIDTH = 128;
     private const HEIGHT = 128;
 
-    private Camera2D $camera;
     private Rectangle $shape;
     private float $walkSpeed = 0.7; // steps per second
     private float $lastStep = 0.0;
 
     private array $waypoints = [];
 
-    public function __construct(Raylib $raylib, Camera2D $camera, Grid2D $grid, Vector2 $pos)
+    public function __construct(GameState $state, Vector2 $pos)
     {
-        parent::__construct($raylib, $grid, $pos);
-
-        $this->camera = $camera;
+        parent::__construct($state, $pos);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
     }
 
     public function update(): void
     {
-        if ($this->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
-            $this->moveTo($this->raylib->getMousePosition());
+        if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
+            $this->moveTo($this->state->raylib->getMousePosition());
         }
 
-        $delta = $this->raylib->getTime() - $this->lastStep;
+        $delta = $this->state->raylib->getTime() - $this->lastStep;
         if ($delta >= $this->walkSpeed) {
             $this->step();
         }
@@ -48,18 +45,18 @@ class Villager extends Unit
     {
         $this->waypoints = [];
 
-        $dest = $this->raylib->getScreenToWorld2D($dest, $this->camera);
-        $cell = $this->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
+        $dest = $this->state->raylib->getScreenToWorld2D($dest, $this->state->camera);
+        $cell = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
         $dest = $cell->pos;
 
-        $start = $this->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        $start = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
         while (true) {
             if ($start->pos->x === $dest->x && $start->pos->y === $dest->y) {
                 break;
             }
 
             /** @var Cell[] $neighbours */
-            $neighbours = $this->grid->neighbours($start);
+            $neighbours = $this->state->grid->neighbours($start);
 
             $h = [];
             foreach ($neighbours as $neighbour) {
@@ -75,7 +72,7 @@ class Villager extends Unit
 
     public function step(): void
     {
-        $this->lastStep = $this->raylib->getTime();
+        $this->lastStep = $this->state->raylib->getTime();
 
         $waypoint = array_shift($this->waypoints);
         if ($waypoint) {
@@ -86,11 +83,11 @@ class Villager extends Unit
     public function draw(): void
     {
         $rec = clone $this->shape;
-        $cell = $this->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
 
         $rec->x = $cell->rec->x;
         $rec->y = $cell->rec->y;
 
-        $this->raylib->drawRectangleRec($rec, Color::red());
+        $this->state->raylib->drawRectangleRec($rec, Color::red());
     }
 }

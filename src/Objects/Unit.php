@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace RTS\Objects;
 
-use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Vector2;
-use RTS\Grid\Grid2D;
+use RTS\GameState;
 
 abstract class Unit
 {
-    protected Raylib $raylib;
-    protected Grid2D $grid;
-    protected Vector2 $pos;
+    protected GameState $state;
+    public Vector2 $pos;
 
-    public function __construct(Raylib $raylib, Grid2D $grid, Vector2 $pos)
+    public function __construct(GameState $state, Vector2 $pos)
     {
-        $this->raylib = $raylib;
-        $this->grid = $grid;
+        $this->state = $state;
         $this->pos = $pos;
     }
 
