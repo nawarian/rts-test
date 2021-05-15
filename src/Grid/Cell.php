@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace RTS\Grid;
 
+use Nawarian\Raylib\Types\Rectangle;
+
 final class Cell
 {
-    public int $x = 0;
-    public int $y = 0;
+    public Rectangle $rec;
     public array $data = [];
 
-    public function __construct(int $x, int $y)
+    public function __construct(Rectangle $rec)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->rec = $rec;
     }
 }

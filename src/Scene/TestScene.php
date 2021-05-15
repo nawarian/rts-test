@@ -37,6 +37,7 @@ final class TestScene implements Scene
     public function update(): void
     {
         $this->updateCamera();
+        $this->map->update();
     }
 
     private function updateCamera(): void
@@ -55,6 +56,13 @@ final class TestScene implements Scene
 
         $r->beginMode2D($this->camera);
             $this->map->draw();
+
+            // Draw cursor
+            $cursor = $this->raylib->getScreenToWorld2D($this->raylib->getMousePosition(), $this->camera);
+            $highlight = $this->map->grid->cellByWorldCoords((int) $cursor->x, (int) $cursor->y);
+            $hightlightColor = Color::orange();
+            $hightlightColor->alpha = 100;
+            $this->raylib->drawRectangleRec($highlight->rec, $hightlightColor);
         $r->endMode2D();
     }
 }

@@ -33,13 +33,18 @@ final class Game
         $r->setTargetFPS($this->targetFPS);
 
         $this->scene->create();
+        $lastTick = $r->getFrameTime();
         while ($this->running) {
+            $now = $r->getFrameTime();
+            $delta = $now - $lastTick;
+            $lastTick = $now;
+
             $this->running = $this->running && !$r->windowShouldClose();
             if ($r->isKeyPressed(Raylib::KEY_TAB)) {
                 $this->debug = !$this->debug;
             }
 
-            $this->scene->update();
+            $this->scene->update($delta);
 
             $r->beginDrawing();
                 $r->clearBackground(Color::black());

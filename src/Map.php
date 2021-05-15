@@ -6,16 +6,18 @@ namespace RTS;
 
 use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Color;
-use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Texture2D;
+use Nawarian\Raylib\Types\Vector2;
 use RTS\Grid\Cell;
 use RTS\Grid\Grid2D;
+use RTS\Objects\Villager;
 
 final class Map
 {
     private Raylib $raylib;
-    private Grid2D $grid;
+    public Grid2D $grid;
     private Spritesheet $tileset;
+    private array $units = [];
 
     public function __construct(Raylib $raylib, Texture2D $texture)
     {
@@ -31,6 +33,8 @@ final class Map
             128,
             128,
         );
+
+        $this->units[] = new Villager($this->raylib, $this->grid, new Vector2(7, 6));
     }
 
     private function initGrid(): void
@@ -68,22 +72,28 @@ final class Map
         }
     }
 
+    public function update(): void
+    {
+        foreach ($this->units as $unit) {
+            $unit->update();
+        }
+    }
+
     public function draw(): void
     {
         $gridColor = Color::black();
         $gridColor->alpha = 50;
 
-        $cellSize = 128;
-        $cellRec = new Rectangle(0, 0, $cellSize, $cellSize);
         /** @var Cell $cell */
         foreach ($this->grid as $cell) {
-            $cellRec->x = $cell->x * $cellSize;
-            $cellRec->y = $cell->y * $cellSize;
-
             $this->tileset
                 ->get($cell->data['gid'])
-                ->draw($cellRec, 0, 1);
-             $this->raylib->drawRectangleLinesEx($cellRec, 1, $gridColor);
+                ->draw($cell->rec, 0, 1);
+             $this->raylib->drawRectangleLinesEx($cell->rec, 1, $gridColor);
+        }
+
+        foreach ($this->units as $unit) {
+            $unit->draw();
         }
     }
 }
