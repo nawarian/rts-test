@@ -1,0 +1,28 @@
+{
+    "name": "nawarian/rts-test",
+    "type": "project",
+    "license": "GPL-3-or-later",
+    "repositories": [
+        {
+            "type": "github",
+            "url": "https://github.com/nawarian/raylib-ffi"
+        }
+    ],
+    "authors": [
+        {
+            "name": "Nawarian",
+            "email": "nickolas@phpsp.org.br"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=8.0",
+        "ext-dom": "*",
+        "nawarian/raylib-ffi": "dev-main"
+    },
+    "autoload": {
+        "psr-4": {
+            "": "src/"
+        }
+    }
+}

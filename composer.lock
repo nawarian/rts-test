@@ -1,0 +1,92 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "06f77144b785cc61274c41f8ed139fef",
+    "packages": [
+        {
+            "name": "nawarian/raylib-ffi",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nawarian/raylib-ffi.git",
+                "reference": "d9eab052c2b2cc88b4d88904992666adc540d519"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nawarian/raylib-ffi/zipball/d9eab052c2b2cc88b4d88904992666adc540d519",
+                "reference": "d9eab052c2b2cc88b4d88904992666adc540d519",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ffi": "^7.4|^8.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.4",
+                "captainhook/plugin-composer": "^5.2",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.5",
+                "vimeo/psalm": "^4.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nawarian\\Raylib\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Nawarian\\Tests\\Raylib\\": "tests/"
+                }
+            },
+            "scripts": {
+                "phpunit": [
+                    "phpunit"
+                ],
+                "phpcs": [
+                    "phpcs --standard=PSR12 -s src/ examples/"
+                ],
+                "psalm": [
+                    "psalm"
+                ],
+                "checks": [
+                    "@psalm",
+                    "@phpcs",
+                    "@phpunit"
+                ]
+            },
+            "license": [
+                "GPL-3-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Nawarian",
+                    "email": "nickolas@phpsp.org.br"
+                }
+            ],
+            "description": "Raylib bindings for PHP using FFI",
+            "support": {
+                "source": "https://github.com/nawarian/raylib-ffi/tree/main",
+                "issues": "https://github.com/nawarian/raylib-ffi/issues"
+            },
+            "time": "2021-05-14T22:05:02+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "nawarian/raylib-ffi": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=8.0"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}
