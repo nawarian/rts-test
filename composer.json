@@ -18,11 +18,12 @@
     "require": {
         "php": ">=8.0",
         "ext-dom": "*",
-        "nawarian/raylib-ffi": "dev-main"
+        "nawarian/raylib-ffi": "dev-main",
+        "php-di/php-di": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "RTS\\": "src/"
         }
     }
 }
