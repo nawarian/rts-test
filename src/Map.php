@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RTS;
 
 use Nawarian\Raylib\Raylib;
+use Nawarian\Raylib\Types\Camera2D;
 use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Texture2D;
 use Nawarian\Raylib\Types\Vector2;
@@ -17,11 +18,13 @@ final class Map
     private Raylib $raylib;
     public Grid2D $grid;
     private Spritesheet $tileset;
+    private Camera2D $camera;
     private array $units = [];
 
-    public function __construct(Raylib $raylib, Texture2D $texture)
+    public function __construct(Raylib $raylib, Texture2D $texture, Camera2D $camera)
     {
         $this->raylib = $raylib;
+        $this->camera = $camera;
 
         $this->initGrid();
 
@@ -34,7 +37,7 @@ final class Map
             128,
         );
 
-        $this->units[] = new Villager($this->raylib, $this->grid, new Vector2(7, 6));
+        $this->units[] = new Villager($this->raylib, $this->camera, $this->grid, new Vector2(7, 6));
     }
 
     private function initGrid(): void

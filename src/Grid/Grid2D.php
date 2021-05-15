@@ -7,6 +7,7 @@ namespace RTS\Grid;
 use ArrayAccess;
 use Iterator;
 use Nawarian\Raylib\Types\Rectangle;
+use Nawarian\Raylib\Types\Vector2;
 use SplFixedArray;
 use Traversable;
 
@@ -28,7 +29,10 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
         $c = 0;
         for ($i = 0; $i < $rows; ++$i) {
            for ($j = 0; $j < $cols; ++$j) {
-               $this->cells[$c++] = new Cell(new Rectangle($j * $colSize, $i * $rowSize, $colSize, $rowSize));
+               $this->cells[$c++] = new Cell(
+                   new Vector2($j, $i),
+                   new Rectangle($j * $colSize, $i * $rowSize, $colSize, $rowSize),
+               );
            }
         }
     }
@@ -59,5 +63,15 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
         }
 
         return $this->cells[$c];
+    }
+
+    public function neighbours(Cell $cell): iterable
+    {
+        return [
+            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y),
+            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y),
+            $this->cell(((int) $cell->pos->x), (int) $cell->pos->y - 1),
+            $this->cell(((int) $cell->pos->x), (int) $cell->pos->y + 1),
+        ];
     }
 }

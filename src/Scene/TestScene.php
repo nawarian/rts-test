@@ -23,15 +23,15 @@ final class TestScene implements Scene
 
     public function create(): void
     {
-        $texture = $this->raylib->loadTexture(self::MAP_TILESET);
-        $this->map = new Map($this->raylib, $texture);
-
         $this->camera = new Camera2D(
             new Vector2(0, 0),
             new Vector2(0, 0),
             0,
             .5,
         );
+
+        $texture = $this->raylib->loadTexture(self::MAP_TILESET);
+        $this->map = new Map($this->raylib, $texture, $this->camera);
     }
 
     public function update(): void
