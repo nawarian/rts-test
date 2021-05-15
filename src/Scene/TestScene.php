@@ -91,18 +91,14 @@ final class TestScene implements Scene
 
     public function update(): void
     {
-        $this->updateCamera();
-        $this->state->update();
-    }
-
-    private function updateCamera(): void
-    {
         $r = $this->raylib;
         $dx = $r->isKeyDown(Raylib::KEY_D) - $r->isKeyDown(Raylib::KEY_A);
         $dy = $r->isKeyDown(Raylib::KEY_S) - $r->isKeyDown(Raylib::KEY_W);
 
         $this->state->camera->target->x += $dx * self::CAMERA_SPEED;
         $this->state->camera->target->y += $dy * self::CAMERA_SPEED;
+
+        $this->state->update();
     }
 
     public function draw(bool $debug): void
