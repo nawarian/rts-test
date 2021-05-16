@@ -15,7 +15,7 @@ final class GameState
     public Raylib $raylib;
     public Grid2D $grid;
     public Camera2D $camera;
-    public bool $debug = false;
+    public bool $debug = true;
 
     public function __construct(Raylib $raylib, Grid2D $grid, Camera2D $camera)
     {

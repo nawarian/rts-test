@@ -48,14 +48,15 @@ class Villager extends Unit
 
     private function moveTo(Vector2 $dest): void
     {
-        if ($this->state->debug) {
-            $this->debug['waypoints'] = [];
-        }
-
         $this->waypoints = [];
 
         $dest = $this->state->raylib->getScreenToWorld2D($dest, $this->state->camera);
         $goal = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
+
+        if ($this->state->debug) {
+            $this->debug['waypoints'] = [];
+            $this->debug['goal'] = $goal;
+        }
 
         $current = $this->state->grid->cell((int)$this->pos->x, (int)$this->pos->y);
         while (true) {
@@ -77,10 +78,6 @@ class Villager extends Unit
             if ($this->state->debug) {
                 $this->debug['waypoints'][] = $current;
             }
-        }
-
-        if ($this->state->debug) {
-            $this->debug['goal'] = $goal;
         }
     }
 
