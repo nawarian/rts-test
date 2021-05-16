@@ -8,6 +8,7 @@ use Nawarian\Raylib\{Raylib, Types\Camera2D, Types\Color, Types\Vector2};
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\Grid\Grid2D;
+use RTS\Objects\Building;
 use RTS\Objects\Villager;
 use RTS\Spritesheet;
 
@@ -84,9 +85,14 @@ final class TestScene implements Scene
             128,
         );
 
-        $this->state->add(
-            new Villager($this->state, new Vector2(7, 6))
-        );
+        $this->state->add(new Villager($this->state, new Vector2(4, 4), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(5, 5), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(5, 6), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(6, 6), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(7, 6), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(8, 6), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(9, 6), $this->tileset));
+        $this->state->add(new Building($this->state, new Vector2(9, 5), $this->tileset));
     }
 
     public function update(): void

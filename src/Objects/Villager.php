@@ -11,6 +11,7 @@ use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 use RTS\Grid\Cell;
+use RTS\Spritesheet;
 
 class Villager extends Unit
 {
@@ -18,15 +19,17 @@ class Villager extends Unit
     private const HEIGHT = 128;
 
     private Rectangle $shape;
+    private Spritesheet $spritesheet;
     private float $walkSpeed = 0.7; // steps per second
     private float $lastStep = 0.0;
 
     private array $waypoints = [];
 
-    public function __construct(GameState $state, Vector2 $pos)
+    public function __construct(GameState $state, Vector2 $pos, Spritesheet $spritesheet)
     {
         parent::__construct($state, $pos);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
+        $this->spritesheet = $spritesheet;
     }
 
     public function update(): void
@@ -88,6 +91,6 @@ class Villager extends Unit
         $rec->x = $cell->rec->x;
         $rec->y = $cell->rec->y;
 
-        $this->state->raylib->drawRectangleRec($rec, Color::red());
+        $this->spritesheet->get(120)->draw($rec, 0, 1);
     }
 }

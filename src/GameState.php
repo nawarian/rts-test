@@ -6,8 +6,8 @@ namespace RTS;
 
 use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Camera2D;
-use RTS\Grid\Cell;
 use RTS\Grid\Grid2D;
+use RTS\Objects\Building;
 use RTS\Objects\Unit;
 
 final class GameState
@@ -35,15 +35,14 @@ final class GameState
 
     public function add(Unit $unit): self
     {
-        $cell = $this->cell((int) $unit->pos->x, (int) $unit->pos->y);
+        $cell = $this->grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
         $cell->data['units'] = $cell->data['units'] ?? [];
         $cell->data['units'][] = $unit;
 
-        return $this;
-    }
+        if ($unit instanceof Building) {
+            $cell->data['collides'] = true;
+        }
 
-    public function cell(int $x, int $y): Cell
-    {
-        return $this->grid->cell($x, $y);
+        return $this;
     }
 }
