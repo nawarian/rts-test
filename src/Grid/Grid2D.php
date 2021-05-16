@@ -69,9 +69,17 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
     {
         return [
             $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y),
+            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y - 1), // diag
+            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y + 1), // diag
             $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y),
+            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y - 1), // diag
+            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y + 1), // diag
             $this->cell(((int) $cell->pos->x), (int) $cell->pos->y - 1),
+            $this->cell(((int) $cell->pos->x) - 1, (int) $cell->pos->y - 1), // diag
+            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y - 1), // diag
             $this->cell(((int) $cell->pos->x), (int) $cell->pos->y + 1),
+            $this->cell(((int) $cell->pos->x) - 1, (int) $cell->pos->y + 1), // diag
+            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y + 1), // diag
         ];
     }
 }
