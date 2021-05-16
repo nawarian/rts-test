@@ -16,7 +16,6 @@ final class GameLoop
     private int $screenHeight;
     private int $targetFPS = 60;
     private bool $running = true;
-    private bool $debug = true;
 
     private Raylib $raylib;
     private Scene $scene;
@@ -34,33 +33,14 @@ final class GameLoop
 
         $this->scene->create();
         while ($this->running) {
-
             $this->running = $this->running && !$r->windowShouldClose();
-            if ($r->isKeyPressed(Raylib::KEY_TAB)) {
-                $this->debug = !$this->debug;
-            }
 
             $this->scene->update();
 
             $r->beginDrawing();
                 $r->clearBackground(Color::black());
 
-                $this->scene->draw($this->debug);
-
-                // Draw debug stats
-                if ($this->debug) {
-                    $r->drawFPS(0, 0);
-
-                    $text = sprintf('Mem: %04d Kb', memory_get_usage(true) / 1024);
-                    $textSize = $r->measureText($text, 20);
-                    $r->drawText(
-                        $text,
-                        $this->screenWidth - $textSize,
-                        $this->screenHeight - 20,
-                        20,
-                        Color::lime(),
-                    );
-                }
+                $this->scene->draw();
             $r->endDrawing();
         }
 

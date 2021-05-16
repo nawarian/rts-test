@@ -107,9 +107,25 @@ final class TestScene implements Scene
         $this->state->update();
     }
 
-    public function draw(bool $debug): void
+    public function draw(): void
     {
         $r = $this->raylib;
+
+
+        // Draw debug stats
+        if ($this->state->debug) {
+            $r->drawFPS(0, 0);
+
+            $text = sprintf('Mem: %04d Kb', memory_get_usage(true) / 1024);
+            $textSize = $r->measureText($text, 20);
+            $r->drawText(
+                $text,
+                800 - $textSize,
+                600 - 20,
+                20,
+                Color::lime(),
+            );
+        }
 
         $r->beginMode2D($this->state->camera);
             $this->drawMap();

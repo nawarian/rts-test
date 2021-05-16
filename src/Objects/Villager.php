@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace RTS\Objects;
 
 use Nawarian\Raylib\Raylib;
-use Nawarian\Raylib\Types\Camera2D;
 use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
@@ -23,6 +22,8 @@ class Villager extends Unit
     private float $walkSpeed = 0.7; // steps per second
     private float $lastStep = 0.0;
 
+    private array $debug = [];
+
     private array $waypoints = [];
 
     public function __construct(GameState $state, Vector2 $pos, Spritesheet $spritesheet)
@@ -39,38 +40,64 @@ class Villager extends Unit
         }
 
         $delta = $this->state->raylib->getTime() - $this->lastStep;
-        if ($delta >= $this->walkSpeed) {
+        if ($delta >= $this->walkSpeed && count($this->waypoints) > 0) {
             $this->step();
         }
     }
 
     private function moveTo(Vector2 $dest): void
     {
+        if ($this->state->debug) {
+            $this->debug['waypoints'] = [];
+        }
+
         $this->waypoints = [];
 
         $dest = $this->state->raylib->getScreenToWorld2D($dest, $this->state->camera);
-        $cell = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
-        $dest = $cell->pos;
+        $goal = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
 
-        $start = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        $current = $this->state->grid->cell((int)$this->pos->x, (int)$this->pos->y);
         while (true) {
-            if ($start->pos->x === $dest->x && $start->pos->y === $dest->y) {
+            if ($current === $goal) {
                 break;
             }
 
-            /** @var Cell[] $neighbours */
-            $neighbours = $this->state->grid->neighbours($start);
-
             $h = [];
-            foreach ($neighbours as $neighbour) {
-                $heuristic = abs($neighbour->pos->x - $dest->x) + abs($neighbour->pos->y - $dest->y);
-                $h[$heuristic] = $neighbour;
+            $neighbours = $this->state->grid->neighbours($current);
+            foreach ($neighbours as $next) {
+                $cost = $this->heuristic($goal->pos, $next->pos);
+                $h[$cost] = $next;
             }
-            ksort($h);
 
-            $start = array_shift($h);
-            $this->waypoints[] = $start->pos;
+            ksort($h);
+            $current = array_shift($h);
+            $this->waypoints[] = $current->pos;
+
+            if ($this->state->debug) {
+                $this->debug['waypoints'][] = $current;
+            }
         }
+
+        if ($this->state->debug) {
+            $this->debug['goal'] = $goal;
+        }
+    }
+
+    private function cost(Cell $current, Cell $next): int
+    {
+        if ($next->data['collides'] ?? false) {
+            return 10;
+        }
+
+        return 1;
+    }
+
+    private function heuristic(Vector2 $node, Vector2 $goal): int
+    {
+        $dx = abs($goal->x - $node->x);
+        $dy = abs($goal->y - $node->y);
+
+        return (int) (1 * ($dx + $dy));
     }
 
     public function step(): void
@@ -78,8 +105,11 @@ class Villager extends Unit
         $this->lastStep = $this->state->raylib->getTime();
 
         $waypoint = array_shift($this->waypoints);
-        if ($waypoint) {
-            $this->pos = $waypoint;
+        $this->pos = $waypoint;
+
+        if ($this->state->debug && count($this->waypoints) === 0) {
+            $this->debug['waypoints'] = [];
+            $this->debug['goal'] = null;
         }
     }
 
@@ -92,5 +122,28 @@ class Villager extends Unit
         $rec->y = $cell->rec->y;
 
         $this->spritesheet->get(120)->draw($rec, 0, 1);
+
+        if ($this->state->debug) {
+            $this->drawDebug();
+        }
+    }
+
+    private function drawDebug(): void
+    {
+        $waypoints = $this->debug['waypoints'] ?? [];
+        $green = Color::gold();
+        $green->alpha = 100;
+
+        /** @var Cell $waypoint */
+        foreach ($waypoints as $waypoint) {
+            $this->state->raylib->drawRectangleRec($waypoint->rec, $green);
+        }
+
+        /** @var Cell|null $goal */
+        if ($goal = $this->debug['goal'] ?? null) {
+            $blue = Color::blue();
+            $blue->alpha = 120;
+            $this->state->raylib->drawRectangleRec($goal->rec, $blue);
+        }
     }
 }

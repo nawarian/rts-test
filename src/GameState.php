@@ -15,6 +15,7 @@ final class GameState
     public Raylib $raylib;
     public Grid2D $grid;
     public Camera2D $camera;
+    public bool $debug = false;
 
     public function __construct(Raylib $raylib, Grid2D $grid, Camera2D $camera)
     {
@@ -25,6 +26,10 @@ final class GameState
 
     public function update(): void
     {
+        if ($this->raylib->isKeyPressed(Raylib::KEY_TAB)) {
+            $this->debug = !$this->debug;
+        }
+
         foreach ($this->grid as $cell) {
             /** @var Unit $unit */
             foreach ($cell->data['units'] ?? [] as $unit) {

@@ -10,5 +10,5 @@ interface Scene
 
     public function update(): void;
 
-    public function draw(bool $debug): void;
+    public function draw(): void;
 }

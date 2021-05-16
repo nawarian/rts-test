@@ -67,19 +67,23 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
 
     public function neighbours(Cell $cell): iterable
     {
-        return [
-            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y),
-            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y - 1), // diag
-            $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y + 1), // diag
-            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y),
-            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y - 1), // diag
-            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y + 1), // diag
-            $this->cell(((int) $cell->pos->x), (int) $cell->pos->y - 1),
-            $this->cell(((int) $cell->pos->x) - 1, (int) $cell->pos->y - 1), // diag
-            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y - 1), // diag
-            $this->cell(((int) $cell->pos->x), (int) $cell->pos->y + 1),
-            $this->cell(((int) $cell->pos->x) - 1, (int) $cell->pos->y + 1), // diag
-            $this->cell(((int) $cell->pos->x) + 1, (int) $cell->pos->y + 1), // diag
-        ];
+        $cells = [];
+        if ($cell->pos->x > 0) {
+            $cells[] = $this->cell((int) $cell->pos->x - 1, (int) $cell->pos->y);
+        }
+
+        if ($cell->pos->x < $this->cols - 1) {
+            $cells[] = $this->cell((int) $cell->pos->x + 1, (int) $cell->pos->y);
+        }
+
+        if ($cell->pos->y > 0) {
+            $cells[] = $this->cell((int) $cell->pos->x, (int) $cell->pos->y - 1);
+        }
+
+        if ($cell->pos->y < $this->rows - 1) {
+            $cells[] = $this->cell((int) $cell->pos->x, (int) $cell->pos->y + 1);
+        }
+
+        return $cells;
     }
 }
