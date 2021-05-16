@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace RTS\Objects;
 
 use Nawarian\Raylib\Raylib;
-use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\Spritesheet;
+use SplObjectStorage;
 use SplPriorityQueue;
+use function RTS\manhattanDistance;
 
 class Villager extends Unit
 {
@@ -20,95 +21,96 @@ class Villager extends Unit
 
     private Rectangle $shape;
     private Spritesheet $spritesheet;
-    private float $walkSpeed = 0.7; // steps per second
+    private float $walkStepsInterval = 0.3; // time consumed per step (seconds)
     private float $lastStep = 0.0;
 
-    private array $debug = [];
-
-    private array $waypoints = [];
+    private SplPriorityQueue $waypoints;
 
     public function __construct(GameState $state, Vector2 $pos, Spritesheet $spritesheet)
     {
         parent::__construct($state, $pos);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
         $this->spritesheet = $spritesheet;
+        $this->waypoints = new SplPriorityQueue();
     }
 
     public function update(): void
     {
+        // Set waypoints
         if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
-            $this->moveTo($this->state->raylib->getMousePosition());
+            $dest = $this->state->raylib->getScreenToWorld2D(
+                $this->state->raylib->getMousePosition(),
+                $this->state->camera,
+            );
+            $goal = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
+
+            $this->setWaypointsTowards($goal);
         }
 
+        // Consuming waypoints (movement)
         $delta = $this->state->raylib->getTime() - $this->lastStep;
-        if ($delta >= $this->walkSpeed && count($this->waypoints) > 0) {
-            $this->step();
+        if ($delta >= $this->walkStepsInterval && !$this->waypoints->isEmpty()) {
+            $this->lastStep = $this->state->raylib->getTime();
+
+            $waypoint = $this->waypoints->extract();
+            $this->pos = $waypoint;
         }
     }
 
-    private function moveTo(Vector2 $dest): void
+    private function setWaypointsTowards(Cell $goal): void
     {
-        $this->waypoints = [];
-
-        $dest = $this->state->raylib->getScreenToWorld2D($dest, $this->state->camera);
-        $goal = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
-
-        if ($this->state->debug) {
-            $this->debug['waypoints'] = [];
-            $this->debug['goal'] = $goal;
+        if ($goal->data['collides'] ?? false) {
+            // @todo fetch closest node instead of skipping buildings
+            return;
         }
 
+        // Clear any previous waypoints (interrupts previous movement if any)
+        $this->waypoints = new SplPriorityQueue();
+
+        $frontier = new SplPriorityQueue();
+        $cameFrom = new SplObjectStorage();
+        $costSoFar = new SplObjectStorage();
+
         $current = $this->state->grid->cell((int)$this->pos->x, (int)$this->pos->y);
-        while (true) {
+        $frontier->insert($current, 0);
+        $costSoFar[$current] = 0;
+
+        while (!$frontier->isEmpty()) {
+            $current = $frontier->extract();
+
             if ($current === $goal) {
                 break;
             }
 
-            $q = new SplPriorityQueue();
-            $neighbours = $this->state->grid->neighbours($current);
-            foreach ($neighbours as $next) {
-                $cost = $this->heuristic($goal->pos, $next->pos);
-                // Invert `$cost` to we reverse the priority queue's implementation
-                $q->insert($next, 1 / $cost);
-            }
+            /** @var Cell $neighbour */
+            foreach ($this->state->grid->neighbours($current) as $next) {
+                if ($next->data['collides'] ?? false) {
+                    continue;
+                }
 
-            $current = $q->top();
-            $this->waypoints[] = $current->pos;
+                $gCost = manhattanDistance($current->pos, $next->pos);
+                $newCost = $costSoFar[$current] + $gCost;
 
-            if ($this->state->debug) {
-                $this->debug['waypoints'][] = $current;
+                if (!$costSoFar->contains($next) || $newCost < $costSoFar[$next]) {
+                    $costSoFar[$next] = $newCost;
+                    $hCost = manhattanDistance($goal->pos, $next->pos);
+                    // f(n) = g(n) + h(n) (see https://www.redblobgames.com/pathfinding/a-star/introduction.html)
+                    $priority = $newCost + $hCost;
+
+                    // Stores with 1/$priority because we need the smallest first
+                    $frontier->insert($next, 1 / $priority);
+
+                    $cameFrom[$next] = $current;
+                }
             }
         }
-    }
 
-    private function cost(Cell $current, Cell $next): int
-    {
-        if ($next->data['collides'] ?? false) {
-            return 10;
-        }
-
-        return 1;
-    }
-
-    private function heuristic(Vector2 $node, Vector2 $goal): int
-    {
-        $dx = abs($goal->x - $node->x);
-        $dy = abs($goal->y - $node->y);
-
-        $heuristic = (int) (1 * ($dx + $dy));
-        return $heuristic + 1;
-    }
-
-    public function step(): void
-    {
-        $this->lastStep = $this->state->raylib->getTime();
-
-        $waypoint = array_shift($this->waypoints);
-        $this->pos = $waypoint;
-
-        if ($this->state->debug && count($this->waypoints) === 0) {
-            $this->debug['waypoints'] = [];
-            $this->debug['goal'] = null;
+        $i = 0;
+        $last = $goal;
+        $this->waypoints->insert($last->pos, $i++);
+        while ($cameFrom->contains($last)) {
+            $last = $cameFrom[$last];
+            $this->waypoints->insert($last->pos, $i++);
         }
     }
 
@@ -121,28 +123,5 @@ class Villager extends Unit
         $rec->y = $cell->rec->y;
 
         $this->spritesheet->get(120)->draw($rec, 0, 1);
-
-        if ($this->state->debug) {
-            $this->drawDebug();
-        }
-    }
-
-    private function drawDebug(): void
-    {
-        $waypoints = $this->debug['waypoints'] ?? [];
-        $green = Color::gold();
-        $green->alpha = 100;
-
-        /** @var Cell $waypoint */
-        foreach ($waypoints as $waypoint) {
-            $this->state->raylib->drawRectangleRec($waypoint->rec, $green);
-        }
-
-        /** @var Cell|null $goal */
-        if ($goal = $this->debug['goal'] ?? null) {
-            $blue = Color::blue();
-            $blue->alpha = 120;
-            $this->state->raylib->drawRectangleRec($goal->rec, $blue);
-        }
     }
 }

@@ -22,6 +22,7 @@
         "php-di/php-di": "dev-master"
     },
     "autoload": {
+        "files": ["src/functions.php"],
         "psr-4": {
             "RTS\\": "src/"
         }
