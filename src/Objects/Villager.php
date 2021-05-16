@@ -11,6 +11,7 @@ use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\Spritesheet;
+use SplPriorityQueue;
 
 class Villager extends Unit
 {
@@ -62,15 +63,15 @@ class Villager extends Unit
                 break;
             }
 
-            $h = [];
+            $q = new SplPriorityQueue();
             $neighbours = $this->state->grid->neighbours($current);
             foreach ($neighbours as $next) {
                 $cost = $this->heuristic($goal->pos, $next->pos);
-                $h[$cost] = $next;
+                // Invert `$cost` to we reverse the priority queue's implementation
+                $q->insert($next, 1 / $cost);
             }
 
-            ksort($h);
-            $current = array_shift($h);
+            $current = $q->top();
             $this->waypoints[] = $current->pos;
 
             if ($this->state->debug) {
@@ -97,7 +98,8 @@ class Villager extends Unit
         $dx = abs($goal->x - $node->x);
         $dy = abs($goal->y - $node->y);
 
-        return (int) (1 * ($dx + $dy));
+        $heuristic = (int) (1 * ($dx + $dy));
+        return $heuristic + 1;
     }
 
     public function step(): void
