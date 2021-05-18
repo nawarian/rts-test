@@ -6,8 +6,6 @@ use DI\ContainerBuilder;
 use Nawarian\Raylib\{Raylib, RaylibFactory};
 use Psr\Container\ContainerInterface;
 use RTS\GameLoop;
-use RTS\Grid\Grid2D;
-use RTS\Map;
 use RTS\Scene\TestScene;
 use function DI\autowire;
 
