@@ -23,8 +23,9 @@ final class Sprite
         $this->source = $source;
     }
 
-    public function draw(Rectangle $dest, float $rotation, float $scale): void
+    public function draw(Rectangle $dest, float $rotation, float $scale, ?Color $tint = null): void
     {
+        $tint = $tint ?? Color::white();
         $this->raylib->drawTextureTiled(
             $this->tex,
             $this->source,
@@ -32,7 +33,7 @@ final class Sprite
             new Vector2(0, 0),
             $rotation,
             $scale,
-            Color::white(),
+            $tint,
         );
     }
 }

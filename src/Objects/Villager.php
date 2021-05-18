@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RTS\Objects;
 
 use Nawarian\Raylib\Raylib;
+use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
@@ -36,13 +37,27 @@ class Villager extends Unit
 
     public function update(): void
     {
-        // Set waypoints
-        if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
-            $dest = $this->state->raylib->getScreenToWorld2D(
+        if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_LEFT_BUTTON)) {
+            $clickedCoords = $this->state->raylib->getScreenToWorld2D(
                 $this->state->raylib->getMousePosition(),
                 $this->state->camera,
             );
-            $goal = $this->state->grid->cellByWorldCoords((int) $dest->x, (int) $dest->y);
+
+            $currentCell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+            if ($this->state->raylib->checkCollisionPointRec($clickedCoords, $currentCell->rec)) {
+                $this->select();
+            } elseif ($this->isSelected()) {
+                $this->deselect();
+            }
+        }
+
+        // Set waypoints
+        if ($this->isSelected() && $this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
+            $clickedCoords = $this->state->raylib->getScreenToWorld2D(
+                $this->state->raylib->getMousePosition(),
+                $this->state->camera,
+            );
+            $goal = $this->state->grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
 
             $this->setWaypointsTowards($goal);
         }
@@ -122,6 +137,9 @@ class Villager extends Unit
         $rec->x = $cell->rec->x;
         $rec->y = $cell->rec->y;
 
-        $this->spritesheet->get(120)->draw($rec, 0, 1);
+        $this->spritesheet->get(120)->draw($rec, 0, 1, Color::white());
+        if ($this->isSelected()) {
+            $this->spritesheet->get(120)->draw($rec, 0, 1, Color::red(50));
+        }
     }
 }
