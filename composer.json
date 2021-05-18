@@ -19,7 +19,8 @@
         "php": ">=8.0",
         "ext-dom": "*",
         "nawarian/raylib-ffi": "dev-main",
-        "php-di/php-di": "dev-master"
+        "php-di/php-di": "dev-master",
+        "evenement/evenement": "dev-master"
     },
     "autoload": {
         "files": ["src/functions.php"],

@@ -18,7 +18,6 @@ final class GameLoop
     private bool $running = true;
 
     private Raylib $raylib;
-    private Scene $scene;
 
     public function __construct(Raylib $raylib)
     {
@@ -27,29 +26,43 @@ final class GameLoop
 
     public function start(): void
     {
+        $this->registerEventHandlers();
+
         $r = $this->raylib;
         $r->initWindow($this->screenWidth, $this->screenHeight, self::GAME_TITLE);
         $r->setTargetFPS($this->targetFPS);
 
-        $this->scene->create();
+        Event::emit(Event::LOOP_CREATE);
         while ($this->running) {
             $this->running = $this->running && !$r->windowShouldClose();
 
-            $this->scene->update();
+            Event::emit(Event::LOOP_UPDATE);
 
             $r->beginDrawing();
                 $r->clearBackground(Color::black());
 
-                $this->scene->draw();
+                Event::emit(Event::LOOP_DRAW);
             $r->endDrawing();
         }
 
         $r->closeWindow();
     }
 
+    private function registerEventHandlers(): void
+    {
+        Event::on(Event::LOOP_INTERRUPT, fn() => $this->running = false);
+    }
+
     public function withScene(Scene $scene): self
     {
-        $this->scene = $scene;
+        Event::removeAllListeners(Event::LOOP_CREATE);
+        Event::removeAllListeners(Event::LOOP_DRAW);
+        Event::removeAllListeners(Event::LOOP_UPDATE);
+
+        Event::on(Event::LOOP_CREATE, [$scene, 'create']);
+        Event::on(Event::LOOP_DRAW, [$scene, 'draw']);
+        Event::on(Event::LOOP_UPDATE, [$scene, 'update']);
+
         return $this;
     }
 
