@@ -111,26 +111,32 @@ final class TestScene implements Scene
     {
         $r = $this->raylib;
 
+        $r->beginMode2D($this->state->camera);
+            $this->drawMap();
+            $this->drawCursor();
+        $r->endMode2D();
 
         // Draw debug stats
         if ($this->state->debug) {
-            $r->drawFPS(0, 0);
+            $text = sprintf('FPS %02d', $r->getFPS());
+            $r->drawText(
+                $text,
+                5,
+                5,
+                20,
+                Color::white(),
+            );
 
             $text = sprintf('Mem: %04d Kb', memory_get_usage(true) / 1024);
             $textSize = $r->measureText($text, 20);
             $r->drawText(
                 $text,
-                800 - $textSize,
+                800 - $textSize - 10,
                 600 - 20,
                 20,
-                Color::lime(),
+                Color::white(),
             );
         }
-
-        $r->beginMode2D($this->state->camera);
-            $this->drawMap();
-            $this->drawCursor();
-        $r->endMode2D();
     }
 
     private function drawMap(): void

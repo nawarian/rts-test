@@ -55,12 +55,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nawarian/raylib-ffi.git",
-                "reference": "9d471e6bff3af8088f5c54d349e2a54ade3ccbbe"
+                "reference": "a3b5b45026835bbc80217cb8bfee88749fac8f53"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nawarian/raylib-ffi/zipball/9d471e6bff3af8088f5c54d349e2a54ade3ccbbe",
-                "reference": "9d471e6bff3af8088f5c54d349e2a54ade3ccbbe",
+                "url": "https://api.github.com/repos/nawarian/raylib-ffi/zipball/a3b5b45026835bbc80217cb8bfee88749fac8f53",
+                "reference": "a3b5b45026835bbc80217cb8bfee88749fac8f53",
                 "shasum": ""
             },
             "require": {
@@ -117,7 +117,7 @@
                 "source": "https://github.com/nawarian/raylib-ffi/tree/main",
                 "issues": "https://github.com/nawarian/raylib-ffi/issues"
             },
-            "time": "2021-05-17T11:38:20+00:00"
+            "time": "2021-05-21T17:13:47+00:00"
         },
         {
             "name": "opis/closure",
