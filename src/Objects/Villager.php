@@ -67,8 +67,12 @@ class Villager extends Unit
         if ($delta >= $this->walkStepsInterval && !$this->waypoints->isEmpty()) {
             $this->lastStep = $this->state->raylib->getTime();
 
+            $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+            $cell->unit = null;
             $waypoint = $this->waypoints->extract();
             $this->pos = $waypoint;
+            $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+            $cell->unit = $this;
         }
     }
 

@@ -31,18 +31,14 @@ final class GameState
         }
 
         foreach ($this->grid as $cell) {
-            /** @var Unit $unit */
-            foreach ($cell->data['units'] ?? [] as $unit) {
-                $unit->update();
-            }
+            $cell->unit && $cell->unit->update();
         }
     }
 
     public function add(Unit $unit): self
     {
         $cell = $this->grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
-        $cell->data['units'] = $cell->data['units'] ?? [];
-        $cell->data['units'][] = $unit;
+        $cell->unit = $unit;
 
         if ($unit instanceof Building) {
             $cell->data['collides'] = true;

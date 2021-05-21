@@ -135,8 +135,9 @@ final class TestScene implements Scene
 
     private function drawMap(): void
     {
+        $debug = $this->state->debug;
         $gridColor = Color::black();
-        $gridColor->alpha = 50;
+        $gridColor->alpha = 20;
 
         /** @var Cell $cell */
         foreach ($this->state->grid as $cell) {
@@ -147,9 +148,13 @@ final class TestScene implements Scene
         }
 
         foreach ($this->state->grid as $cell) {
-            foreach ($cell->data['units'] ?? [] as $unit) {
-                $unit->draw();
+            $gridDebugColor = Color::lime(100);
+            if ($cell->unit) {
+                $gridDebugColor = Color::red(100);
+                $cell->unit->draw();
             }
+
+            $debug && $this->raylib->drawRectangleRec($cell->rec, $gridDebugColor);
         }
     }
 
