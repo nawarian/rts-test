@@ -85,8 +85,19 @@ final class TestScene implements Scene
             128,
         );
 
-        $this->state->add(new Villager($this->state, new Vector2(4, 4), $this->tileset));
-        $this->state->add(new Villager($this->state, new Vector2(3, 3), $this->tileset));
+        $villager1 = new Villager($this->state, new Vector2(4, 4), $this->tileset);
+        $villager1->select();
+        $villager2 = new Villager($this->state, new Vector2(3, 3), $this->tileset);
+        $villager2->select();
+        $villager3 = new Villager($this->state, new Vector2(2, 2), $this->tileset);
+        $villager3->select();
+        $villager4 = new Villager($this->state, new Vector2(3, 2), $this->tileset);
+        $villager4->select();
+
+        $this->state->add($villager1);
+        $this->state->add($villager2);
+        $this->state->add($villager3);
+        $this->state->add($villager4);
         $this->state->add(new Building($this->state, new Vector2(5, 5), $this->tileset));
         $this->state->add(new Building($this->state, new Vector2(5, 6), $this->tileset));
         $this->state->add(new Building($this->state, new Vector2(6, 6), $this->tileset));
