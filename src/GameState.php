@@ -11,35 +11,27 @@ use RTS\Objects\Unit;
 
 final class GameState
 {
-    public Raylib $raylib;
-    public Grid2D $grid;
-    public Camera2D $camera;
-    public bool $debug = true;
+    public static Raylib $raylib;
+    public static Grid2D $grid;
+    public static Camera2D $camera;
+    public static Spritesheet $tileset;
+    public static bool $debug = true;
 
-    public function __construct(Raylib $raylib, Grid2D $grid, Camera2D $camera)
+    public static function update(): void
     {
-        $this->raylib = $raylib;
-        $this->grid = $grid;
-        $this->camera = $camera;
-    }
-
-    public function update(): void
-    {
-        if ($this->raylib->isKeyPressed(Raylib::KEY_TAB)) {
-            $this->debug = !$this->debug;
+        if (self::$raylib->isKeyPressed(Raylib::KEY_TAB)) {
+            self::$debug = !self::$debug;
         }
 
-        foreach ($this->grid as $cell) {
+        foreach (self::$grid as $cell) {
             $cell->data['collides'] = !is_null($cell->unit);
             $cell->unit && $cell->unit->update();
         }
     }
 
-    public function add(Unit $unit): self
+    public static function add(Unit $unit): void
     {
-        $cell = $this->grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
+        $cell = self::$grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
         $cell->unit = $unit;
-
-        return $this;
     }
 }

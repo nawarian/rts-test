@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace RTS;
 
-use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Texture2D;
 
 final class Spritesheet
 {
-    private Raylib $raylib;
     private Texture2D $tex;
 
     private int $margin;
@@ -19,14 +17,12 @@ final class Spritesheet
     private int $spriteHeight;
 
     public function __construct(
-        Raylib $raylib,
         Texture2D $texture,
         int $margin,
         int $spacing,
         int $spriteWidth,
         int $spriteHeight
     ) {
-        $this->raylib = $raylib;
         $this->tex = $texture;
 
         $this->margin = $margin;
@@ -46,6 +42,6 @@ final class Spritesheet
         $rec->x += $this->spriteWidth * $col + ($this->spacing * $col);
         $rec->y += $this->spriteHeight * $row + ($this->spacing * $row);
 
-        return new Sprite($this->raylib, $this->tex, $rec);
+        return new Sprite($this->tex, $rec);
     }
 }

@@ -10,7 +10,6 @@ use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 use RTS\Grid\Cell;
-use RTS\Spritesheet;
 use SplObjectStorage;
 use SplPriorityQueue;
 use function RTS\manhattanDistance;
@@ -21,31 +20,29 @@ class Villager extends Unit
     private const HEIGHT = 128;
 
     private Rectangle $shape;
-    private Spritesheet $spritesheet;
     private ?Cell $goal = null;
     private float $walkStepsInterval = 0.3; // time consumed per step (seconds)
     private float $lastStep = 0.0;
 
     private SplPriorityQueue $waypoints;
 
-    public function __construct(GameState $state, Vector2 $pos, Spritesheet $spritesheet)
+    public function __construct(Vector2 $pos)
     {
-        parent::__construct($state, $pos);
+        parent::__construct($pos);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
-        $this->spritesheet = $spritesheet;
         $this->waypoints = new SplPriorityQueue();
     }
 
     public function update(): void
     {
-        $currentCell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
-        if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_LEFT_BUTTON)) {
-            $clickedCoords = $this->state->raylib->getScreenToWorld2D(
-                $this->state->raylib->getMousePosition(),
-                $this->state->camera,
+        $currentCell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        if (GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_LEFT_BUTTON)) {
+            $clickedCoords = GameState::$raylib->getScreenToWorld2D(
+                GameState::$raylib->getMousePosition(),
+                GameState::$camera,
             );
 
-            if ($this->state->raylib->checkCollisionPointRec($clickedCoords, $currentCell->rec)) {
+            if (GameState::$raylib->checkCollisionPointRec($clickedCoords, $currentCell->rec)) {
                 $this->select();
             } elseif ($this->isSelected()) {
                 $this->deselect();
@@ -53,28 +50,28 @@ class Villager extends Unit
         }
 
         // Set waypoints
-        if ($this->isSelected() && $this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
-            $clickedCoords = $this->state->raylib->getScreenToWorld2D(
-                $this->state->raylib->getMousePosition(),
-                $this->state->camera,
+        if ($this->isSelected() && GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
+            $clickedCoords = GameState::$raylib->getScreenToWorld2D(
+                GameState::$raylib->getMousePosition(),
+                GameState::$camera,
             );
-            $goal = $this->state->grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
+            $goal = GameState::$grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
             $this->goal = $goal;
 
             $this->setWaypointsTowards($goal);
         }
 
         // Consuming waypoints (movement)
-        $delta = $this->state->raylib->getTime() - $this->lastStep;
+        $delta = GameState::$raylib->getTime() - $this->lastStep;
         if ($delta >= $this->walkStepsInterval && !$this->waypoints->isEmpty()) {
-            $this->lastStep = $this->state->raylib->getTime();
+            $this->lastStep = GameState::$raylib->getTime();
 
             $nextStep = $this->waypoints->extract();
             if ($nextStep->x === $this->pos->x && $nextStep->y == $this->pos->y) {
                 return;
             }
 
-            $nextCell = $this->state->grid->cell((int) $nextStep->x, (int) $nextStep->y);
+            $nextCell = GameState::$grid->cell((int) $nextStep->x, (int) $nextStep->y);
 
             $nextCellBlocked = $nextCell->data['collides'] ?? false;
             // If next step is blocked, recalculate route
@@ -106,7 +103,7 @@ class Villager extends Unit
         $cameFrom = new SplObjectStorage();
         $costSoFar = new SplObjectStorage();
 
-        $current = $this->state->grid->cell((int)$this->pos->x, (int)$this->pos->y);
+        $current = GameState::$grid->cell((int)$this->pos->x, (int)$this->pos->y);
         $frontier->insert($current, 0);
         $costSoFar[$current] = 0;
 
@@ -118,7 +115,7 @@ class Villager extends Unit
             }
 
             /** @var Cell $neighbour */
-            foreach ($this->state->grid->neighbours($current) as $next) {
+            foreach (GameState::$grid->neighbours($current) as $next) {
                 if ($next->data['collides'] ?? false) {
                     continue;
                 }
@@ -152,14 +149,14 @@ class Villager extends Unit
     public function draw(): void
     {
         $rec = clone $this->shape;
-        $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        $cell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
 
         $rec->x = $cell->rec->x;
         $rec->y = $cell->rec->y;
 
-        $this->spritesheet->get(120)->draw($rec, 0, 1, Color::white());
+        GameState::$tileset->get(120)->draw($rec, 0, 1, Color::white());
         if ($this->isSelected()) {
-            $this->spritesheet->get(120)->draw($rec, 0, 1, Color::red(50));
+            GameState::$tileset->get(120)->draw($rec, 0, 1, Color::red(50));
         }
     }
 }

@@ -12,12 +12,7 @@ use function DI\autowire;
 $builder = new ContainerBuilder();
 
 $builder->addDefinitions([
-    GameLoop::class => function (ContainerInterface $c) {
-        $raylib = $c->get(Raylib::class);
-
-        return new GameLoop($raylib);
-    },
-
+    GameLoop::class => autowire(GameLoop::class),
     TestScene::class => autowire(TestScene::class),
 
     // Vendor

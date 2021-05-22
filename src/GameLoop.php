@@ -17,18 +17,11 @@ final class GameLoop
     private int $targetFPS = 60;
     private bool $running = true;
 
-    private Raylib $raylib;
-
-    public function __construct(Raylib $raylib)
-    {
-        $this->raylib = $raylib;
-    }
-
     public function start(): void
     {
         $this->registerEventHandlers();
 
-        $r = $this->raylib;
+        $r = GameState::$raylib;
         $r->initWindow($this->screenWidth, $this->screenHeight, self::GAME_TITLE);
         $r->setTargetFPS($this->targetFPS);
 

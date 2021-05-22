@@ -8,7 +8,7 @@ use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 
-class Building extends Unit
+final class Tree extends Unit
 {
     private const WIDTH = 128;
     private const HEIGHT = 128;
@@ -33,6 +33,6 @@ class Building extends Unit
         $rec->x = $cell->rec->x;
         $rec->y = $cell->rec->y;
 
-        GameState::$tileset->get(115)->draw($rec, 0, 1);
+        GameState::$tileset->get(62)->draw($rec, 0, 1);
     }
 }
