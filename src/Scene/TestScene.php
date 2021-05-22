@@ -86,6 +86,7 @@ final class TestScene implements Scene
         );
 
         $this->state->add(new Villager($this->state, new Vector2(4, 4), $this->tileset));
+        $this->state->add(new Villager($this->state, new Vector2(3, 3), $this->tileset));
         $this->state->add(new Building($this->state, new Vector2(5, 5), $this->tileset));
         $this->state->add(new Building($this->state, new Vector2(5, 6), $this->tileset));
         $this->state->add(new Building($this->state, new Vector2(6, 6), $this->tileset));

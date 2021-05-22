@@ -7,7 +7,6 @@ namespace RTS;
 use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Camera2D;
 use RTS\Grid\Grid2D;
-use RTS\Objects\Building;
 use RTS\Objects\Unit;
 
 final class GameState
@@ -31,6 +30,7 @@ final class GameState
         }
 
         foreach ($this->grid as $cell) {
+            $cell->data['collides'] = !is_null($cell->unit);
             $cell->unit && $cell->unit->update();
         }
     }
@@ -39,10 +39,6 @@ final class GameState
     {
         $cell = $this->grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
         $cell->unit = $unit;
-
-        if ($unit instanceof Building) {
-            $cell->data['collides'] = true;
-        }
 
         return $this;
     }

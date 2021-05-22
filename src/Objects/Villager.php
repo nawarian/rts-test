@@ -22,6 +22,7 @@ class Villager extends Unit
 
     private Rectangle $shape;
     private Spritesheet $spritesheet;
+    private ?Cell $goal = null;
     private float $walkStepsInterval = 0.3; // time consumed per step (seconds)
     private float $lastStep = 0.0;
 
@@ -37,13 +38,13 @@ class Villager extends Unit
 
     public function update(): void
     {
+        $currentCell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
         if ($this->state->raylib->isMouseButtonPressed(Raylib::MOUSE_LEFT_BUTTON)) {
             $clickedCoords = $this->state->raylib->getScreenToWorld2D(
                 $this->state->raylib->getMousePosition(),
                 $this->state->camera,
             );
 
-            $currentCell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
             if ($this->state->raylib->checkCollisionPointRec($clickedCoords, $currentCell->rec)) {
                 $this->select();
             } elseif ($this->isSelected()) {
@@ -58,6 +59,7 @@ class Villager extends Unit
                 $this->state->camera,
             );
             $goal = $this->state->grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
+            $this->goal = $goal;
 
             $this->setWaypointsTowards($goal);
         }
@@ -67,12 +69,26 @@ class Villager extends Unit
         if ($delta >= $this->walkStepsInterval && !$this->waypoints->isEmpty()) {
             $this->lastStep = $this->state->raylib->getTime();
 
-            $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
-            $cell->unit = null;
-            $waypoint = $this->waypoints->extract();
-            $this->pos = $waypoint;
-            $cell = $this->state->grid->cell((int) $this->pos->x, (int) $this->pos->y);
-            $cell->unit = $this;
+            $nextStep = $this->waypoints->extract();
+            if ($nextStep->x === $this->pos->x && $nextStep->y == $this->pos->y) {
+                return;
+            }
+
+            $nextCell = $this->state->grid->cell((int) $nextStep->x, (int) $nextStep->y);
+
+            $nextCellBlocked = $nextCell->data['collides'] ?? false;
+            // If next step is blocked, recalculate route
+            if ($nextCellBlocked && ($this->goal ?? false)) {
+                $this->setWaypointsTowards($this->goal);
+            } elseif ($nextCellBlocked) {
+                // If next step is blocked and we don't have a goal for some reason, stop
+                $this->setWaypointsTowards($currentCell);
+            } else {
+                // Path is unblocked, let's just update the Unit's position
+                $currentCell->unit = null;
+                $this->pos = $nextCell->pos;
+                $nextCell->unit = $this;
+            }
         }
     }
 
