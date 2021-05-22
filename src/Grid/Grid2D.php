@@ -27,11 +27,11 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
         $this->rows = $rows;
 
         $c = 0;
-        for ($i = 0; $i < $rows; ++$i) {
-           for ($j = 0; $j < $cols; ++$j) {
+        for ($y = 0; $y < $rows; ++$y) {
+           for ($x = 0; $x < $cols; ++$x) {
                $this->cells[$c++] = new Cell(
-                   new Vector2($j, $i),
-                   new Rectangle($j * $colSize, $i * $rowSize, $colSize, $rowSize),
+                   new Vector2($x, $y),
+                   new Rectangle($x * $colSize, $y * $rowSize, $colSize, $rowSize),
                );
            }
         }

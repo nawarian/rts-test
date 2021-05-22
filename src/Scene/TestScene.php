@@ -28,7 +28,7 @@ final class TestScene implements Scene
         GameState::$tileset = $tileset;
 
         foreach ($units as $unit) {
-            $cell = GameState::$grid->cellByWorldCoords($unit['x'], $unit['y']);
+            $cell = GameState::$grid->cellByWorldCoords($unit['x'] + $unit['width'] / 2, $unit['y']);
             $unitClassName = $unit['type'];
 
             if (class_exists($unitClassName)) {
