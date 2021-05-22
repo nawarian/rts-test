@@ -113,8 +113,30 @@ final class TestScene implements Scene
         $dx = $r->isKeyDown(Raylib::KEY_D) - $r->isKeyDown(Raylib::KEY_A);
         $dy = $r->isKeyDown(Raylib::KEY_S) - $r->isKeyDown(Raylib::KEY_W);
 
-        $this->state->camera->target->x += $dx * self::CAMERA_SPEED;
-        $this->state->camera->target->y += $dy * self::CAMERA_SPEED;
+        $cameraTarget = $this->state->camera->target;
+        $cameraTarget->x += $dx * self::CAMERA_SPEED;
+        $cameraTarget->y += $dy * self::CAMERA_SPEED;
+
+        if ($cameraTarget->x < 0) {
+            $cameraTarget->x = 0;
+        }
+
+        if ($cameraTarget->y < 0) {
+            $cameraTarget->y = 0;
+        }
+
+        $cellCount = $this->state->grid->cells->count();
+        $screenWidth = $r->getScreenWidth();
+        $screenHeight = $r->getScreenHeight();
+        /** @var Cell $lastCell */
+        $lastCell = $this->state->grid->cells[$cellCount - 1];
+        if ($cameraTarget->x + $screenWidth * 2 > $lastCell->rec->x + $lastCell->rec->width) {
+            $cameraTarget->x = $lastCell->rec->x + $lastCell->rec->width - $screenWidth * 2;
+        }
+
+        if ($cameraTarget->y + $screenHeight * 2 > $lastCell->rec->y + $lastCell->rec->height) {
+            $cameraTarget->y = $lastCell->rec->y + $lastCell->rec->height - $screenHeight * 2;
+        }
 
         $this->state->update();
     }

@@ -16,7 +16,7 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
     use Grid2DIteratorTrait;
     use Grid2DArrayAccessTrait;
 
-    private SplFixedArray $cells;
+    public SplFixedArray $cells;
     private int $rows;
     private int $cols;
 
