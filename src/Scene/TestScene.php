@@ -132,11 +132,14 @@ final class TestScene implements Scene
             (int) (GameState::$raylib->getScreenHeight() * $cameraZoomScale),
         );
 
-        /** @var Cell $cell */
-        foreach (GameState::$grid as $cell) {
-            if (!GameState::$raylib->checkCollisionRecs($viewport, $cell->rec)) {
-                continue;
-            }
+        $firstIndex = GameState::$grid->indexOfWorldCoords((int) $viewport->x, (int) $viewport->y);
+        $lastIndex = GameState::$grid->indexOfWorldCoords(
+            (int) ($viewport->x + $viewport->width),
+            (int) ($viewport->y + $viewport->height),
+        ) + 1;
+
+        for ($i = $firstIndex; $i < $lastIndex; ++$i) {
+            $cell = GameState::$grid[$i];
 
             GameState::$tileset->get($cell->data['gid'])->draw($cell->rec, 0, 1);
             GameState::$raylib->drawRectangleLinesEx($cell->rec, 1, Color::black(20));
