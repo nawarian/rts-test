@@ -25,7 +25,7 @@ final class TestScene implements Scene
             .5,
         );
 
-        [$grid, $tileset, $units] = TiledMapReader::readFile(__DIR__ . '/../../res/test.tmx');
+        [$grid, $tileset, $units] = TiledMapReader::readFile(__DIR__ . '/../../res/map001.tmx');
         GameState::$grid = $grid;
         GameState::$tileset = $tileset;
 
