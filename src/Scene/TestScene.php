@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace RTS\Scene;
 
-use Nawarian\Raylib\{Raylib, Types\Camera2D, Types\Color, Types\Vector2};
+use Nawarian\Raylib\{Raylib, Types\Camera2D, Types\Color, Types\Rectangle, Types\Vector2};
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\TiledMapReader;
@@ -12,7 +12,9 @@ use RuntimeException;
 
 final class TestScene implements Scene
 {
-    private const CAMERA_SPEED = 20;
+    private const CAMERA_SPEED = 40;
+    private const MIN_ZOOM = .4;
+    private const MAX_ZOOM = .6;
 
     public function create(): void
     {
@@ -27,8 +29,12 @@ final class TestScene implements Scene
         GameState::$grid = $grid;
         GameState::$tileset = $tileset;
 
+        $cameraZoomScale = 1 / GameState::$camera->zoom;
         foreach ($units as $unit) {
-            $cell = GameState::$grid->cellByWorldCoords($unit['x'] + $unit['width'] / 2, $unit['y']);
+            $cell = GameState::$grid->cellByWorldCoords(
+                (int)($unit['x'] + $unit['width'] / $cameraZoomScale),
+                $unit['y'],
+            );
             $unitClassName = $unit['type'];
 
             if (class_exists($unitClassName)) {
@@ -72,6 +78,15 @@ final class TestScene implements Scene
             $cameraTarget->y = $lastCell->rec->y + $lastCell->rec->height - $screenHeight * 2;
         }
 
+        if ($zoom = GameState::$raylib->getMouseWheelMove()) {
+            $zoom /= 10;
+            $zoom += GameState::$camera->zoom;
+            $zoom = max(self::MIN_ZOOM, $zoom);
+            $zoom = min(self::MAX_ZOOM, $zoom);
+
+            GameState::$camera->zoom = $zoom;
+        }
+
         GameState::update();
     }
 
@@ -109,35 +124,36 @@ final class TestScene implements Scene
 
     private function drawMap(): void
     {
-        $debug = GameState::$debug;
-        $gridColor = Color::black();
-        $gridColor->alpha = 20;
+        $cameraZoomScale = 1 / GameState::$camera->zoom;
+        $viewport = new Rectangle(
+            GameState::$camera->target->x,
+            GameState::$camera->target->y,
+            (int) (GameState::$raylib->getScreenWidth() * $cameraZoomScale),
+            (int) (GameState::$raylib->getScreenHeight() * $cameraZoomScale),
+        );
 
         /** @var Cell $cell */
         foreach (GameState::$grid as $cell) {
-            GameState::$tileset
-                ->get($cell->data['gid'])
-                ->draw($cell->rec, 0, 1);
-            GameState::$raylib->drawRectangleLinesEx($cell->rec, 1, $gridColor);
-        }
-
-        foreach (GameState::$grid as $cell) {
-            $gridDebugColor = Color::lime(100);
-            if ($cell->unit) {
-                $gridDebugColor = Color::red(100);
-                $cell->unit->draw();
+            if (!GameState::$raylib->checkCollisionRecs($viewport, $cell->rec)) {
+                continue;
             }
 
-            $debug && GameState::$raylib->drawRectangleRec($cell->rec, $gridDebugColor);
+            GameState::$tileset->get($cell->data['gid'])->draw($cell->rec, 0, 1);
+            GameState::$raylib->drawRectangleLinesEx($cell->rec, 1, Color::black(20));
+
+            $cell->unit && $cell->unit->draw();
+
+            GameState::$debug && GameState::$raylib->drawRectangleRec(
+                $cell->rec,
+                $cell->unit ? Color::red(100) : Color::lime(100),
+            );
         }
     }
 
     private function drawCursor(): void
     {
         $cursor = GameState::$raylib->getScreenToWorld2D(GameState::$raylib->getMousePosition(), GameState::$camera);
-        $highlight = GameState::$grid->cellByWorldCoords((int)$cursor->x, (int)$cursor->y);
-        $hightlightColor = Color::orange();
-        $hightlightColor->alpha = 100;
-        GameState::$raylib->drawRectangleRec($highlight->rec, $hightlightColor);
+        $highlight = GameState::$grid->cellByWorldCoords((int) $cursor->x, (int) $cursor->y);
+        GameState::$raylib->drawRectangleRec($highlight->rec, Color::orange(100));
     }
 }
