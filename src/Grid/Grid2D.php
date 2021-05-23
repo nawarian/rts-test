@@ -19,12 +19,16 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
     public SplFixedArray $cells;
     private int $rows;
     private int $cols;
+    private int $colSize;
+    private int $rowSize;
 
     public function __construct(int $cols, int $rows, int $colSize = 128, int $rowSize = 128)
     {
         $this->cells = new SplFixedArray($cols * $rows);
         $this->cols = $cols;
+        $this->colSize = $colSize;
         $this->rows = $rows;
+        $this->rowSize = $rowSize;
 
         $c = 0;
         for ($y = 0; $y < $rows; ++$y) {
@@ -39,30 +43,12 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
 
     public function cellByWorldCoords(int $x, int $y): Cell
     {
-        foreach ($this->cells as $cell) {
-            if ($x >= $cell->rec->x && $x <= ($cell->rec->x + $cell->rec->width)) {
-                if ($y >= $cell->rec->y && $y <= ($cell->rec->y + $cell->rec->height)) {
-                    break;
-                }
-            }
-        }
-
-        return $cell;
+        return $this->cell((int) ($x / $this->colSize), (int) ($y / $this->rowSize));
     }
 
     public function cell(int $x, int $y): Cell
     {
-        $c = 0;
-        for ($i = 0; $i < $this->rows; ++$i) {
-            for ($j = 0; $j < $this->cols; ++$j) {
-                if ($i === $y && $j === $x) {
-                    break(2);
-                }
-                $c++;
-            }
-        }
-
-        return $this->cells[$c];
+        return $this->cells[$x + ($y * $this->cols)];
     }
 
     public function neighbours(Cell $cell): iterable
