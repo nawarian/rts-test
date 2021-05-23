@@ -141,6 +141,18 @@ final class TestScene implements Scene
         for ($i = $firstIndex; $i < $lastIndex; ++$i) {
             $cell = GameState::$grid[$i];
 
+            /**
+             * Hacky optimisation. The $firstIndex and $lastIndex variables cut
+             * a significant portion of the iteration array, but many cells aren't
+             * in the viewport.
+             *
+             * The perfect solution would create slices with multiple $first/$last pairs,
+             * each pair representing a grid line that  fits in the viewport.
+             */
+            if (!GameState::$raylib->checkCollisionRecs($cell->rec, $viewport)) {
+                continue;
+            }
+
             GameState::$tileset->get($cell->data['gid'])->draw($cell->rec, 0, 1);
             GameState::$raylib->drawRectangleLinesEx($cell->rec, 1, Color::black(20));
 
