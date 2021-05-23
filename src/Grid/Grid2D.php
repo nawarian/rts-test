@@ -48,7 +48,8 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
 
     public function cell(int $x, int $y): Cell
     {
-        return $this->cells[$x + ($y * $this->cols)];
+        $i = min($x + ($y * $this->cols), count($this->cells) - 1);
+        return $this->cells[$i];
     }
 
     public function neighbours(Cell $cell): iterable
