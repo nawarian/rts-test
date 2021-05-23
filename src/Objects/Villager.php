@@ -83,8 +83,10 @@ class Villager extends Unit
             } else {
                 // Path is unblocked, let's just update the Unit's position
                 $currentCell->unit = null;
+                $currentCell->data['collides'] = false;
                 $this->pos = $nextCell->pos;
                 $nextCell->unit = $this;
+                $nextCell->data['collides'] = true;
             }
         }
     }

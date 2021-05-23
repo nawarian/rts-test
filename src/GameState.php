@@ -22,16 +22,14 @@ final class GameState
         if (self::$raylib->isKeyPressed(Raylib::KEY_TAB)) {
             self::$debug = !self::$debug;
         }
-
-        foreach (self::$grid as $cell) {
-            $cell->data['collides'] = !is_null($cell->unit);
-            $cell->unit && $cell->unit->update();
-        }
     }
 
     public static function add(Unit $unit): void
     {
         $cell = self::$grid->cell((int) $unit->pos->x, (int) $unit->pos->y);
+        $cell->data['collides'] = true;
         $cell->unit = $unit;
+
+        Event::on(Event::LOOP_UPDATE, [$unit, 'update']);
     }
 }
