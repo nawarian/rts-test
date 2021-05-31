@@ -20,22 +20,28 @@ class Villager extends Unit
     private const HEIGHT = 128;
 
     private Rectangle $shape;
-    private ?Cell $goal = null;
-    private float $walkStepsInterval = 0.3; // time consumed per step (seconds)
-    private float $lastStep = 0.0;
-
+    private Vector2 $shapeTranslation;
     private SplPriorityQueue $waypoints;
 
     public function __construct(Vector2 $pos)
     {
         parent::__construct($pos);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
+        $this->shapeTranslation = new Vector2(0, 0);
         $this->waypoints = new SplPriorityQueue();
     }
 
     public function update(): void
     {
         $currentCell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
+
+        $this->toggleSelection($currentCell);
+        $this->updateWaypoints();
+        $this->walk($currentCell);
+    }
+
+    private function toggleSelection(Cell $currentCell): void
+    {
         if (GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_LEFT_BUTTON)) {
             $clickedCoords = GameState::$raylib->getScreenToWorld2D(
                 GameState::$raylib->getMousePosition(),
@@ -48,51 +54,19 @@ class Villager extends Unit
                 $this->deselect();
             }
         }
-
-        // Set waypoints
-        if ($this->isSelected() && GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
-            $clickedCoords = GameState::$raylib->getScreenToWorld2D(
-                GameState::$raylib->getMousePosition(),
-                GameState::$camera,
-            );
-            $goal = GameState::$grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
-            $this->goal = $goal;
-
-            $this->setWaypointsTowards($goal);
-        }
-
-        // Consuming waypoints (movement)
-        $delta = GameState::$raylib->getTime() - $this->lastStep;
-        if ($delta >= $this->walkStepsInterval && !$this->waypoints->isEmpty()) {
-            $this->lastStep = GameState::$raylib->getTime();
-
-            $nextStep = $this->waypoints->extract();
-            if ($nextStep->x === $this->pos->x && $nextStep->y == $this->pos->y) {
-                return;
-            }
-
-            $nextCell = GameState::$grid->cell((int) $nextStep->x, (int) $nextStep->y);
-
-            $nextCellBlocked = $nextCell->data['collides'] ?? false;
-            // If next step is blocked, recalculate route
-            if ($nextCellBlocked && ($this->goal ?? false)) {
-                $this->setWaypointsTowards($this->goal);
-            } elseif ($nextCellBlocked) {
-                // If next step is blocked and we don't have a goal for some reason, stop
-                $this->setWaypointsTowards($currentCell);
-            } else {
-                // Path is unblocked, let's just update the Unit's position
-                $currentCell->unit = null;
-                $currentCell->data['collides'] = false;
-                $this->pos = $nextCell->pos;
-                $nextCell->unit = $this;
-                $nextCell->data['collides'] = true;
-            }
-        }
     }
 
-    private function setWaypointsTowards(Cell $goal): void
+    private function updateWaypoints(): void
     {
+        if (!$this->isSelected() || !GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
+            return;
+        }
+
+        $clickedCoords = GameState::$raylib->getScreenToWorld2D(
+            GameState::$raylib->getMousePosition(),
+            GameState::$camera,
+        );
+        $goal = GameState::$grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
         if ($goal->data['collides'] ?? false) {
             // @todo fetch closest node instead of skipping buildings
             return;
@@ -148,13 +122,57 @@ class Villager extends Unit
         }
     }
 
+    private function walk(Cell $currentCell): void
+    {
+        if ($this->waypoints->isEmpty()) {
+            return;
+        }
+
+        $nextWaypointCoords = $this->waypoints->top();
+
+        // Ignore Villager's current position
+        if ($nextWaypointCoords === $this->pos) {
+            $this->waypoints->extract();
+            $nextWaypointCoords = $this->waypoints->top();
+        }
+
+        $nextCell = GameState::$grid->cell((int) $nextWaypointCoords->x, (int) $nextWaypointCoords->y);
+        // Can't walk towards next cell; let's recalculate route
+        if ($nextCell->unit !== $this && ($nextCell->data['collides'] ?? false)) {
+            $this->updateWaypoints();
+            return;
+        }
+
+        // Block next cell so waypoints between units don't collide
+        $nextCell->unit = $this;
+        $nextCell->data['collides'] = true;
+        if (
+            $currentCell->rec->x + $this->shapeTranslation->x === $nextCell->rec->x
+            && $currentCell->rec->y + $this->shapeTranslation->y === $nextCell->rec->y
+        ) {
+            $this->pos = $nextCell->pos;
+            $currentCell->unit = null;
+            $currentCell->data['collides'] = false;
+            $this->shapeTranslation->x = 0;
+            $this->shapeTranslation->y = 0;
+
+            // Pops $nextCell out of the waypoints array
+            $this->waypoints->extract();
+            return;
+        }
+
+        // Update screen (x,y) coords
+        $this->shapeTranslation->x += $nextCell->pos->x - $this->pos->x;
+        $this->shapeTranslation->y += $nextCell->pos->y - $this->pos->y;
+    }
+
     public function draw(): void
     {
         $rec = clone $this->shape;
         $cell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
 
-        $rec->x = $cell->rec->x;
-        $rec->y = $cell->rec->y;
+        $rec->x = $cell->rec->x + $this->shapeTranslation->x;
+        $rec->y = $cell->rec->y + $this->shapeTranslation->y;
 
         GameState::$tileset->get(120)->draw($rec, 0, 1, Color::white());
         if ($this->isSelected()) {
