@@ -138,6 +138,11 @@ final class TestScene implements Scene
             (int) ($viewport->y + $viewport->height),
         ) + 1;
 
+        $layers = [
+            0 => [], // Ground
+            1 => [], // Objects
+            2 => [], // Debug
+        ];
         for ($i = $firstIndex; $i < $lastIndex; ++$i) {
             $cell = GameState::$grid[$i];
 
@@ -153,15 +158,37 @@ final class TestScene implements Scene
                 continue;
             }
 
-            GameState::$tileset->get($cell->data['gid'])->draw($cell->rec, 0, 1);
-            GameState::$raylib->drawRectangleLinesEx($cell->rec, 1, Color::black(20));
+            $layers[0][] = [
+                'sprite' => GameState::$tileset->get($cell->data['gid']),
+                'rec' => $cell->rec,
+            ];
 
-            $cell->unit && $cell->unit->draw();
+            if ($cell->unit) {
+                $layers[1][] = $cell->unit;
+            }
 
-            GameState::$debug && GameState::$raylib->drawRectangleRec(
-                $cell->rec,
-                $cell->unit ? Color::red(100) : Color::lime(100),
-            );
+            $layers[2][] = [
+                'rec' => $cell->rec,
+                'color' => $cell->unit ? Color::red(100) : Color::lime(100),
+            ];
+        }
+
+        foreach ($layers[0] as $ground) {
+            $ground['sprite']->draw($ground['rec'], 0, 1);
+            GameState::$raylib->drawRectangleLinesEx($ground['rec'], 1, Color::black(20));
+        }
+
+        foreach ($layers[1] as $object) {
+            $object->draw();
+        }
+
+        if (GameState::$debug) {
+            foreach ($layers[2] as $debug) {
+                GameState::$raylib->drawRectangleRec(
+                    $debug['rec'],
+                    $debug['color'],
+                );
+            }
         }
     }
 
