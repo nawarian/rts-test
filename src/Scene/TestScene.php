@@ -175,7 +175,6 @@ final class TestScene implements Scene
 
         foreach ($layers[0] as $ground) {
             $ground['sprite']->draw($ground['rec'], 0, 1);
-            GameState::$raylib->drawRectangleLinesEx($ground['rec'], 1, Color::black(20));
         }
 
         foreach ($layers[1] as $object) {
