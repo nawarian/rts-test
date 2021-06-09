@@ -73,13 +73,19 @@ class Villager extends Unit
         }
 
         // Clear any previous waypoints (interrupts previous movement if any)
+        $previousWaypoints = $this->waypoints;
         $this->waypoints = new SplPriorityQueue();
 
         $frontier = new SplPriorityQueue();
         $cameFrom = new SplObjectStorage();
         $costSoFar = new SplObjectStorage();
 
-        $current = GameState::$grid->cell((int)$this->pos->x, (int)$this->pos->y);
+        $current = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        if (!$previousWaypoints->isEmpty()) {
+            $next = $previousWaypoints->top();
+            $current = GameState::$grid->cell((int) $next->x, (int) $next->y);
+        }
+
         $frontier->insert($current, 0);
         $costSoFar[$current] = 0;
 
