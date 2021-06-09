@@ -169,7 +169,7 @@ final class TestScene implements Scene
 
             $layers[2][] = [
                 'rec' => $cell->rec,
-                'color' => $cell->unit ? Color::red(100) : Color::lime(100),
+                'color' => $cell->unit ? Color::red(50) : Color::lime(50),
             ];
         }
 

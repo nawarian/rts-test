@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RTS\Objects;
 
 use InvalidArgumentException;
+use Nawarian\Raylib\Types\Rectangle;
 use RTS\GameState;
 
 final class UnitFactory
@@ -24,7 +25,8 @@ final class UnitFactory
                 );
 
                 /** @var Unit $unitObject */
-            $unitObject = new $unit['type']($cell->pos);
+                $collision = $unit['collision'] ?: [0, 0, 0, 0];
+                $unitObject = new $unit['type']($cell->pos, new Rectangle(...$collision));
                 if (($unit['properties']['selected'] ?? 'false') === 'true') {
                     $unitObject->select();
                 }

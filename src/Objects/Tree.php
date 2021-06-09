@@ -15,9 +15,9 @@ final class Tree extends Unit
 
     private Rectangle $shape;
 
-    public function __construct(Vector2 $pos)
+    public function __construct(Vector2 $pos, Rectangle $collision)
     {
-        parent::__construct($pos);
+        parent::__construct($pos, $collision);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
     }
 

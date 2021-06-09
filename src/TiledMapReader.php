@@ -77,10 +77,10 @@ final class TiledMapReader
 
                     if ($type->nodeValue === 'collision') {
                         $atlas[$id]['collision'] = [
-                            $object->attributes->getNamedItem('x')->nodeValue,
-                            $object->attributes->getNamedItem('y')->nodeValue,
-                            $object->attributes->getNamedItem('width')->nodeValue,
-                            $object->attributes->getNamedItem('height')->nodeValue,
+                            (int) $object->attributes->getNamedItem('x')->nodeValue,
+                            (int) $object->attributes->getNamedItem('y')->nodeValue,
+                            (int) $object->attributes->getNamedItem('width')->nodeValue,
+                            (int) $object->attributes->getNamedItem('height')->nodeValue,
                         ];
                     }
                 }

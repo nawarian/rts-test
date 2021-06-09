@@ -23,9 +23,9 @@ class Villager extends Unit
     private Vector2 $shapeTranslation;
     private SplPriorityQueue $waypoints;
 
-    public function __construct(Vector2 $pos)
+    public function __construct(Vector2 $pos, Rectangle $collision)
     {
-        parent::__construct($pos);
+        parent::__construct($pos, $collision);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
         $this->shapeTranslation = new Vector2(0, 0);
         $this->waypoints = new SplPriorityQueue();
@@ -205,6 +205,17 @@ class Villager extends Unit
                     (int) $rec->y,
                     20,
                     Color::white(),
+                );
+
+                GameState::$raylib->drawRectangleLinesEx(
+                    new Rectangle(
+                        $rec->x + $this->collision->x,
+                        $rec->y + $this->collision->y,
+                        $this->collision->width,
+                        $this->collision->height,
+                    ),
+                    2,
+                    Color::red(),
                 );
             }
         }
