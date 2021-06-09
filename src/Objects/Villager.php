@@ -183,6 +183,21 @@ class Villager extends Unit
         GameState::$tileset->get(120)->draw($rec, 0, 1, Color::white());
         if ($this->isSelected()) {
             GameState::$tileset->get(120)->draw($rec, 0, 1, Color::red(50));
+
+            if (GameState::$debug) {
+                $playerDebugMessage = sprintf("[X=%d, Y=%d]", $this->pos->x, $this->pos->y);
+                $playerDebugMessageSize = GameState::$raylib->measureText($playerDebugMessage, 20);
+
+                $x = $rec->x + ($playerDebugMessageSize / 4);
+
+                GameState::$raylib->drawText(
+                    $playerDebugMessage,
+                    (int) $x,
+                    (int) $rec->y,
+                    20,
+                    Color::white(),
+                );
+            }
         }
     }
 }
