@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace RTS\Scene;
 
+use InvalidArgumentException;
 use Nawarian\Raylib\{Raylib, Types\Camera2D, Types\Color, Types\Rectangle, Types\Vector2};
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\Objects\Unit;
+use RTS\Objects\UnitFactory;
 use RTS\TiledMapReader;
 use RuntimeException;
 
@@ -16,6 +18,13 @@ final class TestScene implements Scene
     private const CAMERA_SPEED = 40;
     private const MIN_ZOOM = .4;
     private const MAX_ZOOM = .6;
+
+    private UnitFactory $unitFactory;
+
+    public function __construct(UnitFactory $unitFactory)
+    {
+        $this->unitFactory = $unitFactory;
+    }
 
     public function create(): void
     {
@@ -30,30 +39,10 @@ final class TestScene implements Scene
         GameState::$grid = $grid;
         GameState::$tileset = $tileset;
 
-        $cameraZoomScale = 1 / GameState::$camera->zoom;
         foreach ($units as $unit) {
-            $unitClassName = $unit['type'] ?? null;
-            if ($unitClassName === null) {
-                continue;
-            }
-
-            $cell = GameState::$grid->cellByWorldCoords(
-                (int) ($unit['x'] + (($unit['collision']['width'] ?? 0) / $cameraZoomScale)),
-                $unit['y'] - 1,
-            );
-
-            if (class_exists($unitClassName)) {
-                /** @var Unit $unitObject */
-                $unitObject = new $unitClassName($cell->pos);
-                if (($unit['properties']['selected'] ?? 'false') === 'true') {
-                    $unitObject->select();
-                }
-
-                GameState::add($unitObject);
-            } else {
-                throw new RuntimeException(
-                    "Could not find unit of type '{$unitClassName}' (x = {$unit['x']}; y = {$unit['y']})."
-                );
+            try {
+                GameState::add($this->unitFactory->createFromArray($unit));
+            } catch (InvalidArgumentException $e) {
             }
         }
     }
