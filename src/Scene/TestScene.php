@@ -32,8 +32,8 @@ final class TestScene implements Scene
         $cameraZoomScale = 1 / GameState::$camera->zoom;
         foreach ($units as $unit) {
             $cell = GameState::$grid->cellByWorldCoords(
-                (int)($unit['x'] + $unit['width'] / $cameraZoomScale),
-                $unit['y'],
+                (int) ($unit['x'] + $unit['width'] / $cameraZoomScale),
+                $unit['y'] - 1,
             );
             $unitClassName = $unit['type'];
 
