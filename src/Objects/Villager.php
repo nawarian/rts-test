@@ -56,9 +56,12 @@ class Villager extends Unit
         }
     }
 
-    private function updateWaypoints(): void
+    private function updateWaypoints(bool $forceRouteUpdate = false): void
     {
-        if (!$this->isSelected() || !GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON)) {
+        if (
+            !$forceRouteUpdate
+            && (!$this->isSelected() || !GameState::$raylib->isMouseButtonPressed(Raylib::MOUSE_RIGHT_BUTTON))
+        ) {
             return;
         }
 
@@ -142,7 +145,7 @@ class Villager extends Unit
         $nextCell = GameState::$grid->cell((int) $nextWaypointCoords->x, (int) $nextWaypointCoords->y);
         // Can't walk towards next cell; let's recalculate route
         if ($nextCell->unit !== $this && ($nextCell->data['collides'] ?? false)) {
-            $this->updateWaypoints();
+            $this->updateWaypoints(true);
         }
     }
 
