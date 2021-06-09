@@ -126,10 +126,7 @@ class Villager extends Unit
             $last = $cameFrom[$last];
             $this->waypoints->insert($last->pos, $i++);
         }
-    }
 
-    private function walk(Cell $currentCell): void
-    {
         if ($this->waypoints->isEmpty()) {
             return;
         }
@@ -146,8 +143,17 @@ class Villager extends Unit
         // Can't walk towards next cell; let's recalculate route
         if ($nextCell->unit !== $this && ($nextCell->data['collides'] ?? false)) {
             $this->updateWaypoints();
+        }
+    }
+
+    private function walk(Cell $currentCell): void
+    {
+        if ($this->waypoints->isEmpty()) {
             return;
         }
+
+        $nextWaypointCoords = $this->waypoints->top();
+        $nextCell = GameState::$grid->cell((int) $nextWaypointCoords->x, (int) $nextWaypointCoords->y);
 
         // Block next cell so waypoints between units don't collide
         $nextCell->unit = $this;
