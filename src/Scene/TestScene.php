@@ -7,6 +7,7 @@ namespace RTS\Scene;
 use Nawarian\Raylib\{Raylib, Types\Camera2D, Types\Color, Types\Rectangle, Types\Vector2};
 use RTS\GameState;
 use RTS\Grid\Cell;
+use RTS\Objects\Unit;
 use RTS\TiledMapReader;
 use RuntimeException;
 
@@ -31,14 +32,24 @@ final class TestScene implements Scene
 
         $cameraZoomScale = 1 / GameState::$camera->zoom;
         foreach ($units as $unit) {
+            $unitClassName = $unit['type'] ?? null;
+            if ($unitClassName === null) {
+                continue;
+            }
+
             $cell = GameState::$grid->cellByWorldCoords(
-                (int) ($unit['x'] + $unit['width'] / $cameraZoomScale),
+                (int) ($unit['x'] + (($unit['collision']['width'] ?? 0) / $cameraZoomScale)),
                 $unit['y'] - 1,
             );
-            $unitClassName = $unit['type'];
 
             if (class_exists($unitClassName)) {
-                GameState::add(new $unitClassName($cell->pos));
+                /** @var Unit $unitObject */
+                $unitObject = new $unitClassName($cell->pos);
+                if (($unit['properties']['selected'] ?? 'false') === 'true') {
+                    $unitObject->select();
+                }
+
+                GameState::add($unitObject);
             } else {
                 throw new RuntimeException(
                     "Could not find unit of type '{$unitClassName}' (x = {$unit['x']}; y = {$unit['y']})."

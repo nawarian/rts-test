@@ -14,8 +14,9 @@ final class TiledMapReader
     public static function readFile(string $mapFilepath): array
     {
         $map = self::loadMap($mapFilepath);
+        $objectAtlas = self::loadObjectAtlas($map, $mapFilepath);
 
-        return [self::loadGrid($map), self::loadTileset($map, $mapFilepath), self::loadUnits($map)];
+        return [self::loadGrid($map), self::loadTileset($map, $mapFilepath), self::loadUnits($map, $objectAtlas)];
     }
 
     private static function loadMap(string $path): DOMDocument
@@ -26,6 +27,67 @@ final class TiledMapReader
         }
 
         return $xml;
+    }
+
+    private static function loadObjectAtlas(DOMDocument $map, string $mapFilepath): array
+    {
+        $basedir = realpath(dirname($mapFilepath));
+        $atlas = [];
+
+        $xpath = new DOMXPath($map);
+        $tilesets = $xpath->query('//map/tileset');
+        /** @var \DOMNode $tileset */
+        foreach ($tilesets as $tileset) {
+            $source = $tileset->attributes->getNamedItem('source');
+            if ($source !== null) {
+                $tilesetDOM = new DOMDocument();
+                $tilesetDOM->load("{$basedir}/{$source->nodeValue}");
+
+                $xpath = new DOMXPath($tilesetDOM);
+                $tileset = $tilesetDOM->firstChild;
+            }
+
+            $tiles = $xpath->query('./tile', $tileset);
+            /** @var \DOMNode $tile */
+            foreach ($tiles as $tile) {
+                $id = (int) $tile->attributes->getNamedItem('id')->nodeValue;
+                $typeAttribute = $tile->attributes->getNamedItem('type');
+                $atlas[$id] = [
+                    'properties' => [],
+                    'type' => $typeAttribute ? $typeAttribute->nodeValue : null,
+                    'collision' => null,
+                ];
+
+                $properties = $xpath->query('./properties/property', $tile);
+                /** @var \DOMNode $property */
+                foreach ($properties as $property) {
+                    $name = $property->attributes->getNamedItem('name')->nodeValue;
+                    $value = $property->attributes->getNamedItem('value')->nodeValue;
+                    $atlas[$id]['properties'][$name] = $value;
+                }
+
+                $objects = $xpath->query('./objectgroup/object', $tile);
+                /** @var \DOMNode $object */
+                foreach ($objects as $object) {
+                    $type = $object->attributes->getNamedItem('type');
+
+                    if ($type === null) {
+                        continue;
+                    }
+
+                    if ($type->nodeValue === 'collision') {
+                        $atlas[$id]['collision'] = [
+                            $object->attributes->getNamedItem('x')->nodeValue,
+                            $object->attributes->getNamedItem('y')->nodeValue,
+                            $object->attributes->getNamedItem('width')->nodeValue,
+                            $object->attributes->getNamedItem('height')->nodeValue,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $atlas;
     }
 
     private static function loadGrid(DOMDocument $map): Grid2D
@@ -57,60 +119,66 @@ final class TiledMapReader
 
     private static function loadTileset(DOMDocument $map, string $filepath): Spritesheet
     {
+        $basedir = realpath(dirname($filepath));
         $xpath = new DOMXPath($map);
-        $tilesetNode = $xpath->query('//map/tileset')->item(0);
+        $tilesets = $xpath->query('//map/tileset');
+        /** @var \DOMNode $tileset */
+        foreach ($tilesets as $tileset) {
+            $source = $tileset->attributes->getNamedItem('source');
+            if ($source !== null) {
+                $tilesetDOM = new DOMDocument();
+                $tilesetDOM->load("{$basedir}/{$source->nodeValue}");
 
-        $tilesetSourceDefinitionsPath = realpath(
-            dirname($filepath) . '/' . trim($tilesetNode->attributes->getNamedItem('source')->nodeValue)
-        );
+                $xpath = new DOMXPath($tilesetDOM);
+                $tileset = $tilesetDOM->firstChild;
+            }
 
-        $tilesetXml = new DOMDocument();
-        if (!$tilesetXml->load($tilesetSourceDefinitionsPath)) {
-            $tilesetFilename = basename($tilesetSourceDefinitionsPath);
-            $fileBaseName = basename($filepath);
-            throw new RuntimeException(
-                "Could not load tileset file '{$tilesetFilename}'. Referenced from {$fileBaseName}."
+            $tilesetAttributes = $tileset->attributes;
+            $tileWidth = (int) $tilesetAttributes->getNamedItem('tilewidth')->nodeValue;
+            $tileHeight = (int) $tilesetAttributes->getNamedItem('tileheight')->nodeValue;
+            $margin = (int) $tilesetAttributes->getNamedItem('margin')->nodeValue;
+            $spacing = (int) $tilesetAttributes->getNamedItem('spacing')->nodeValue;
+
+            $imageAttributes = $xpath->query('//tileset/image', $tileset)->item(0)->attributes;
+            $tilesetImageSource = realpath(
+                dirname($filepath) . '/' . trim($imageAttributes->getNamedItem('source')->nodeValue)
+            );
+
+            $texture = GameState::$raylib->loadTexture($tilesetImageSource);
+            return new Spritesheet(
+                $texture,
+                $margin,
+                $spacing,
+                $tileWidth,
+                $tileHeight,
             );
         }
-        $tilesetXpath = new DOMXPath($tilesetXml);
-
-        $tilesetAttributes = $tilesetXml->firstChild->attributes;
-        $tileWidth = (int) $tilesetAttributes->getNamedItem('tilewidth')->nodeValue;
-        $tileHeight = (int) $tilesetAttributes->getNamedItem('tileheight')->nodeValue;
-        $margin = (int) $tilesetAttributes->getNamedItem('margin')->nodeValue;
-        $spacing = (int) $tilesetAttributes->getNamedItem('spacing')->nodeValue;
-
-        $imageAttributes = $tilesetXpath->query('//tileset/image')->item(0)->attributes;
-        $tilesetImageSource = realpath(
-            dirname($filepath) . '/' . trim($imageAttributes->getNamedItem('source')->nodeValue)
-        );
-
-        $texture = $texture = GameState::$raylib->loadTexture($tilesetImageSource);
-        return new Spritesheet(
-            $texture,
-            $margin,
-            $spacing,
-            $tileWidth,
-            $tileHeight,
-        );
     }
 
-    private static function loadUnits(DOMDocument $map): iterable
+    private static function loadUnits(DOMDocument $map, array $objectAtlas): iterable
     {
         $xpath = new DOMXPath($map);
-        $objects = $xpath->query('//map/objectgroup/object');
+        $domObjects = $xpath->query('//map/objectgroup/object');
 
-        for ($i = 0; $i < $objects->count(); ++$i) {
-            $obj = $objects->item($i)->attributes;
+        /** @var \DOMNode $domObject */
+        foreach ($domObjects as $domObject) {
+            $domObjectAttributes = $domObject->attributes;
+
+            $object = $objectAtlas[(int) $domObjectAttributes->getNamedItem('gid')->nodeValue] ?? [];
+
+            $domProperties = $xpath->query('./properties/property', $domObject);
+            foreach ($domProperties as $domProperty) {
+                $name = $domProperty->attributes->getNamedItem('name')->nodeValue;
+                $value = $domProperty->attributes->getNamedItem('value')->nodeValue;
+                $object['properties'][$name] = $value;
+            }
+
             yield [
-                'id' => (int) $obj->getNamedItem('id')->nodeValue,
-                'gid' => (int) $obj->getNamedItem('gid')->nodeValue,
-                'name' => trim($obj->getNamedItem('name')->nodeValue),
-                'type' => trim($obj->getNamedItem('type')->nodeValue),
-                'x' => (int) $obj->getNamedItem('x')->nodeValue,
-                'y' => (int) $obj->getNamedItem('y')->nodeValue,
-                'width' => (int) $obj->getNamedItem('width')->nodeValue,
-                'height' => (int) $obj->getNamedItem('height')->nodeValue,
+                ...$object,
+                'id' => (int) $domObjectAttributes->getNamedItem('id')->nodeValue,
+                'gid' => (int) $domObjectAttributes->getNamedItem('gid')->nodeValue,
+                'x' => (int) $domObjectAttributes->getNamedItem('x')->nodeValue,
+                'y' => (int) $domObjectAttributes->getNamedItem('y')->nodeValue,
             ];
         }
     }
