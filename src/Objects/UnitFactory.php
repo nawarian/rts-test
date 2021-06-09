@@ -13,27 +13,27 @@ final class UnitFactory
     public function createFromArray(array $unit): Unit
     {
         $cameraZoomScale = 1 / GameState::$camera->zoom;
+        $cell = GameState::$grid->cellByWorldCoords(
+            (int) ($unit['x'] + (($unit['collision']['width'] ?? 0) / $cameraZoomScale)),
+            $unit['y'] - 1,
+        );
+        $collision = $unit['collision'] ?: [0, 0, 0, 0];
 
-        switch ($unit['type']) {
-            case Building::class:
-            case Stone::class:
-            case Tree::class:
-            case Villager::class:
-                $cell = GameState::$grid->cellByWorldCoords(
-                    (int) ($unit['x'] + (($unit['collision']['width'] ?? 0) / $cameraZoomScale)),
-                    $unit['y'] - 1,
-                );
-
-                /** @var Unit $unitObject */
-                $collision = $unit['collision'] ?: [0, 0, 0, 0];
-                $unitObject = new $unit['type']($cell->pos, new Rectangle(...$collision));
-                if (($unit['properties']['selected'] ?? 'false') === 'true') {
-                    $unitObject->select();
-                }
-
-                return $unitObject;
+        if (($unit['type'] ?? '') === '') {
+            throw new InvalidArgumentException("No type defined for object of id '{$unit['id']}'.");
         }
 
-        throw new InvalidArgumentException("Unknown object type '{$unit['type']}'.");
+        /** @var Unit $unitObject */
+        $unitObject = new $unit['type'](
+            $cell->pos,
+            new Rectangle(...$collision),
+            GameState::$tileset->get($unit['gid']),
+        );
+
+        if (($unit['properties']['selected'] ?? 'false') === 'true') {
+            $unitObject->select();
+        }
+
+        return $unitObject;
     }
 }

@@ -7,6 +7,7 @@ namespace RTS\Objects;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
+use RTS\Sprite;
 
 final class Stone extends Unit
 {
@@ -15,9 +16,9 @@ final class Stone extends Unit
 
     private Rectangle $shape;
 
-    public function __construct(Vector2 $pos, Rectangle $collision)
+    public function __construct(Vector2 $pos, Rectangle $collision, Sprite $sprite)
     {
-        parent::__construct($pos, $collision);
+        parent::__construct($pos, $collision, $sprite);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
     }
 

@@ -10,6 +10,7 @@ use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
 use RTS\GameState;
 use RTS\Grid\Cell;
+use RTS\Sprite;
 use SplObjectStorage;
 use SplPriorityQueue;
 use function RTS\manhattanDistance;
@@ -23,9 +24,9 @@ class Villager extends Unit
     private Vector2 $shapeTranslation;
     private SplPriorityQueue $waypoints;
 
-    public function __construct(Vector2 $pos, Rectangle $collision)
+    public function __construct(Vector2 $pos, Rectangle $collision, Sprite $sprite)
     {
-        parent::__construct($pos, $collision);
+        parent::__construct($pos, $collision, $sprite);
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
         $this->shapeTranslation = new Vector2(0, 0);
         $this->waypoints = new SplPriorityQueue();
@@ -48,7 +49,11 @@ class Villager extends Unit
                 GameState::$camera,
             );
 
-            if (GameState::$raylib->checkCollisionPointRec($clickedCoords, $currentCell->rec)) {
+            $rec = clone $this->collision;
+            $rec->x = $currentCell->rec->x + $this->shapeTranslation->x + $this->collision->x;
+            $rec->y = $currentCell->rec->y + $this->shapeTranslation->y + $this->collision->y;
+
+            if (GameState::$raylib->checkCollisionPointRec($clickedCoords, $rec)) {
                 $this->select();
             } elseif ($this->isSelected()) {
                 $this->deselect();
@@ -189,9 +194,9 @@ class Villager extends Unit
         $rec->x = $cell->rec->x + $this->shapeTranslation->x;
         $rec->y = $cell->rec->y + $this->shapeTranslation->y;
 
-        GameState::$tileset->get(120)->draw($rec, 0, 1, Color::white());
+        $this->sprite->draw($rec, 0, 1, Color::white());
         if ($this->isSelected()) {
-            GameState::$tileset->get(120)->draw($rec, 0, 1, Color::red(50));
+            $this->sprite->draw($rec, 0, 1, Color::red(50));
 
             if (GameState::$debug) {
                 $playerDebugMessage = sprintf("[X=%d, Y=%d]", $this->pos->x, $this->pos->y);

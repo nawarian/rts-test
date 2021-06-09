@@ -6,17 +6,20 @@ namespace RTS\Objects;
 
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
+use RTS\Sprite;
 
 abstract class Unit
 {
     public Vector2 $pos;
     public Rectangle $collision;
+    public Sprite $sprite;
     private bool $selected = false;
 
-    public function __construct(Vector2 $pos, Rectangle $collision)
+    public function __construct(Vector2 $pos, Rectangle $collision, Sprite $sprite)
     {
         $this->pos = $pos;
         $this->collision = $collision;
+        $this->sprite = $sprite;
     }
 
     public function select(): void
