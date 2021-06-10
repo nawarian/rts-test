@@ -81,60 +81,13 @@ class Villager extends Unit
         }
 
         // Clear any previous waypoints (interrupts previous movement if any)
-        $previousWaypoints = $this->waypoints;
-        $this->waypoints = new SplPriorityQueue();
-
-        $frontier = new SplPriorityQueue();
-        $cameFrom = new SplObjectStorage();
-        $costSoFar = new SplObjectStorage();
-
         $current = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
-        if (!$previousWaypoints->isEmpty()) {
-            $next = $previousWaypoints->top();
+        if (!$this->waypoints->isEmpty()) {
+            $next = $this->waypoints->top();
             $current = GameState::$grid->cell((int) $next->x, (int) $next->y);
         }
 
-        $frontier->insert($current, 0);
-        $costSoFar[$current] = 0;
-
-        while (!$frontier->isEmpty()) {
-            $current = $frontier->extract();
-
-            if ($current === $goal) {
-                break;
-            }
-
-            /** @var Cell $neighbour */
-            foreach (GameState::$grid->neighbours($current) as $next) {
-                if ($next->data['collides'] ?? false) {
-                    continue;
-                }
-
-                $gCost = manhattanDistance($current->pos, $next->pos);
-                $newCost = $costSoFar[$current] + $gCost;
-
-                if (!$costSoFar->contains($next) || $newCost < $costSoFar[$next]) {
-                    $costSoFar[$next] = $newCost;
-                    $hCost = manhattanDistance($goal->pos, $next->pos);
-                    // f(n) = g(n) + h(n) (see https://www.redblobgames.com/pathfinding/a-star/introduction.html)
-                    $priority = $newCost + $hCost;
-
-                    // Stores with 1/$priority because we need the smallest first
-                    $frontier->insert($next, 1 / $priority);
-
-                    $cameFrom[$next] = $current;
-                }
-            }
-        }
-
-        $i = 0;
-        $last = $goal;
-        $this->waypoints->insert($last->pos, $i++);
-        while ($cameFrom->contains($last)) {
-            $last = $cameFrom[$last];
-            $this->waypoints->insert($last->pos, $i++);
-        }
-
+        $this->waypoints = GameState::$grid->findPath($current, $goal, 30);
         if ($this->waypoints->isEmpty()) {
             return;
         }
