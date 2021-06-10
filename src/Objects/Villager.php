@@ -20,10 +20,12 @@ class Villager extends Unit
     private const WIDTH = 128;
     private const HEIGHT = 128;
 
-    private int $speed = 30;
+    private int $turnsPerSecond = 5;
     private Rectangle $shape;
     private Vector2 $shapeTranslation;
     private SplPriorityQueue $waypoints;
+
+    private int $timeAcc = 0;
 
     public function __construct(Vector2 $pos, Rectangle $collision, Sprite $sprite)
     {
@@ -39,6 +41,16 @@ class Villager extends Unit
 
         $this->toggleSelection($currentCell);
         $this->updateWaypoints();
+
+        $this->timeAcc += (int) (GameState::$raylib->getFrameTime() * 1000);
+        if ($this->timeAcc > (1000 / $this->turnsPerSecond)) {
+            $this->timeAcc = 0;
+            $this->step($currentCell);
+        }
+    }
+
+    private function step(Cell $currentCell): void
+    {
         $this->walk($currentCell);
     }
 
@@ -88,7 +100,7 @@ class Villager extends Unit
             $current = GameState::$grid->cell((int) $next->x, (int) $next->y);
         }
 
-        $this->waypoints = GameState::$grid->findPath($current, $goal, $this->speed);
+        $this->waypoints = GameState::$grid->findPath($current, $goal, $this->turnsPerSecond);
         if ($this->waypoints->isEmpty()) {
             return;
         }
@@ -121,23 +133,23 @@ class Villager extends Unit
         $nextCell->unit = $this;
         $nextCell->data['collides'] = true;
         if (
-            $currentCell->rec->x + $this->shapeTranslation->x === $nextCell->rec->x
-            && $currentCell->rec->y + $this->shapeTranslation->y === $nextCell->rec->y
+            GameState::$raylib->checkCollisionRecs(
+                new Rectangle(
+                    $nextCell->rec->x + $this->collision->x,
+                    $nextCell->rec->y + $this->collision->y,
+                    $this->collision->width,
+                    $this->collision->height
+                ),
+                $nextCell->rec,
+            )
         ) {
             $this->pos = $nextCell->pos;
             $currentCell->unit = null;
             $currentCell->data['collides'] = false;
-            $this->shapeTranslation->x = 0;
-            $this->shapeTranslation->y = 0;
 
             // Pops $nextCell out of the waypoints array
             $this->waypoints->extract();
-            return;
         }
-
-        // Update screen (x,y) coords
-        $this->shapeTranslation->x += $nextCell->pos->x - $this->pos->x;
-        $this->shapeTranslation->y += $nextCell->pos->y - $this->pos->y;
     }
 
     public function draw(): void
@@ -190,7 +202,7 @@ class Villager extends Unit
         );
         $goal = GameState::$grid->cellByWorldCoords((int) $mouseCoords->x, (int) $mouseCoords->y);
 
-        $path = GameState::$grid->findPath($cell, $goal, $this->speed);
+        $path = GameState::$grid->findPath($cell, $goal, $this->turnsPerSecond);
         $path->setExtractFlags(SplPriorityQueue::EXTR_BOTH);
 
         do {
