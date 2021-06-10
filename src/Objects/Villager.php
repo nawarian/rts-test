@@ -147,6 +147,7 @@ class Villager extends Unit
         $rec->x = $cell->rec->x + $this->shapeTranslation->x;
         $rec->y = $cell->rec->y + $this->shapeTranslation->y;
 
+        GameState::$debug && $this->isSelected() && $this->drawPathLabels();
         $this->sprite->draw($rec, 0, 1, Color::white());
         if ($this->isSelected()) {
             $this->sprite->draw($rec, 0, 1, Color::red(50));
@@ -177,5 +178,39 @@ class Villager extends Unit
                 );
             }
         }
+    }
+
+    private function drawPathLabels(): void
+    {
+        $cell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
+        $mouseCoords = GameState::$raylib->getScreenToWorld2D(
+            GameState::$raylib->getMousePosition(),
+            GameState::$camera,
+        );
+        $goal = GameState::$grid->cellByWorldCoords((int) $mouseCoords->x, (int) $mouseCoords->y);
+
+        $path = GameState::$grid->findPath($cell, $goal, 30);
+        $path->setExtractFlags(SplPriorityQueue::EXTR_BOTH);
+
+        do {
+            if ($path->isEmpty()) {
+                break;
+            }
+
+            $pathData = $path->extract();
+            $priority = $pathData['priority'];
+            $coords = $pathData['data'];
+            $cell = GameState::$grid->cell((int) $coords->x, (int) $coords->y);
+
+            $text = "{$priority}";
+            $textSize = GameState::$raylib->measureText($text, 40);
+            GameState::$raylib->drawText(
+                $text,
+                (int) ($cell->rec->x + ($cell->rec->width / 2) - ($textSize / 2)),
+                (int) ($cell->rec->y + ($cell->rec->height / 2) - (40 / 2)),
+                40,
+                Color::white(),
+            );
+        } while (true);
     }
 }
