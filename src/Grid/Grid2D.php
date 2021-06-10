@@ -124,7 +124,7 @@ final class Grid2D implements Traversable, Iterator, ArrayAccess
                     continue;
                 }
 
-                $gCost = manhattanDistance($current->pos, $next->pos);
+                $gCost = manhattanDistance($current->pos, $next->pos) / $speed;
                 $newCost = $costSoFar[$current] + $gCost;
 
                 if (!$costSoFar->contains($next) || $newCost < $costSoFar[$next]) {

@@ -20,6 +20,7 @@ class Villager extends Unit
     private const WIDTH = 128;
     private const HEIGHT = 128;
 
+    private int $speed = 30;
     private Rectangle $shape;
     private Vector2 $shapeTranslation;
     private SplPriorityQueue $waypoints;
@@ -87,7 +88,7 @@ class Villager extends Unit
             $current = GameState::$grid->cell((int) $next->x, (int) $next->y);
         }
 
-        $this->waypoints = GameState::$grid->findPath($current, $goal, 30);
+        $this->waypoints = GameState::$grid->findPath($current, $goal, $this->speed);
         if ($this->waypoints->isEmpty()) {
             return;
         }
@@ -189,7 +190,7 @@ class Villager extends Unit
         );
         $goal = GameState::$grid->cellByWorldCoords((int) $mouseCoords->x, (int) $mouseCoords->y);
 
-        $path = GameState::$grid->findPath($cell, $goal, 30);
+        $path = GameState::$grid->findPath($cell, $goal, $this->speed);
         $path->setExtractFlags(SplPriorityQueue::EXTR_BOTH);
 
         do {
