@@ -24,6 +24,7 @@ final class GameLoop
         $r = GameState::$raylib;
         $r->initWindow($this->screenWidth, $this->screenHeight, self::GAME_TITLE);
         $r->setTargetFPS($this->targetFPS);
+        $r->setExitKey(0);
 
         Event::emit(Event::LOOP_CREATE);
         while ($this->running) {

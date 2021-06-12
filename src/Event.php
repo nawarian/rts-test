@@ -23,6 +23,8 @@ class Event
     public const LOOP_DRAW = 'loop.draw';
     public const LOOP_INTERRUPT = 'loop.interrupt';
     public const LOOP_UPDATE = 'loop.update';
+    public const COMMAND_DISPATCH = 'command.dispatch';
+    public const COMMAND_MOVE = 'command.move';
 
     private static ?EventEmitterInterface $instance = null;
 

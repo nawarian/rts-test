@@ -15,6 +15,7 @@ final class GameState
     public static Grid2D $grid;
     public static Camera2D $camera;
     public static Spritesheet $tileset;
+    public static bool $typing = false;
     public static bool $debug = true;
 
     public static function update(): void

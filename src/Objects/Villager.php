@@ -8,6 +8,7 @@ use Nawarian\Raylib\Raylib;
 use Nawarian\Raylib\Types\Color;
 use Nawarian\Raylib\Types\Rectangle;
 use Nawarian\Raylib\Types\Vector2;
+use RTS\Event;
 use RTS\GameState;
 use RTS\Grid\Cell;
 use RTS\Sprite;
@@ -33,6 +34,15 @@ class Villager extends Unit
         $this->shape = new Rectangle(0, 0, self::WIDTH, self::HEIGHT);
         $this->shapeTranslation = new Vector2(0, 0);
         $this->waypoints = new SplPriorityQueue();
+
+        Event::on(Event::COMMAND_MOVE, [$this, 'handleMoveCommand']);
+    }
+
+    public function handleMoveCommand(int $x, int $y): void
+    {
+        if ($this->isSelected()) {
+            $this->moveTo($x, $y);
+        }
     }
 
     public function update(): void
@@ -88,6 +98,12 @@ class Villager extends Unit
             GameState::$camera,
         );
         $goal = GameState::$grid->cellByWorldCoords((int) $clickedCoords->x, (int) $clickedCoords->y);
+        $this->moveTo((int) $goal->pos->x, (int) $goal->pos->y);
+    }
+
+    private function moveTo(int $x, int $y): void
+    {
+        $goal = GameState::$grid->cell($x, $y);
         if ($goal->data['collides'] ?? false) {
             // @todo fetch closest node instead of skipping buildings
             return;

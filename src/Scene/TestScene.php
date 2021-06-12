@@ -20,14 +20,17 @@ final class TestScene implements Scene
     private const MAX_ZOOM = .6;
 
     private UnitFactory $unitFactory;
+    private ConsoleScene $console;
 
-    public function __construct(UnitFactory $unitFactory)
+    public function __construct(UnitFactory $unitFactory, ConsoleScene $console)
     {
         $this->unitFactory = $unitFactory;
+        $this->console = $console;
     }
 
     public function create(): void
     {
+        $this->console->create();
         GameState::$camera = new Camera2D(
             new Vector2(0, 0),
             new Vector2(0, 0),
@@ -49,7 +52,12 @@ final class TestScene implements Scene
 
     public function update(): void
     {
+        $this->console->update();
         $r = GameState::$raylib;
+
+        if (GameState::$typing) {
+            return;
+        }
         $dx = $r->isKeyDown(Raylib::KEY_D) - $r->isKeyDown(Raylib::KEY_A);
         $dy = $r->isKeyDown(Raylib::KEY_S) - $r->isKeyDown(Raylib::KEY_W);
 
@@ -120,6 +128,8 @@ final class TestScene implements Scene
                 Color::white(),
             );
         }
+
+        $this->console->draw();
     }
 
     private function drawMap(): void
