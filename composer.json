@@ -18,7 +18,6 @@
     "require": {
         "php": ">=8.0",
         "ext-dom": "*",
-        "nawarian/raylib-ffi": "dev-main",
         "php-di/php-di": "dev-master",
         "evenement/evenement": "dev-master"
     },
@@ -27,5 +26,8 @@
         "psr-4": {
             "RTS\\": "src/"
         }
+    },
+    "require-dev": {
+        "nawarian/raylib-ffi": "dev-main"
     }
 }

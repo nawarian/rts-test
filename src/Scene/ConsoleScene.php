@@ -54,8 +54,14 @@ class ConsoleScene implements Scene
 
     public function update(): void
     {
-        if (GameState::$typing === false && GameState::$raylib->isKeyPressed(Raylib::KEY_ENTER)) {
+        $wasEnterKeyPressed = GameState::$raylib->isKeyPressed(Raylib::KEY_ENTER);
+        if (GameState::$typing === false && $wasEnterKeyPressed) {
             GameState::$typing = true;
+            return;
+        }
+
+        if (GameState::$typing === true && $wasEnterKeyPressed && $this->buffer === '') {
+            GameState::$typing = false;
             return;
         }
 

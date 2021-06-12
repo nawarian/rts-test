@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "416569b68417a88454c2986780d78279",
+    "content-hash": "1fe711502ca044bd270e82d959938ac5",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -48,76 +48,6 @@
                 "event-emitter"
             ],
             "time": "2021-01-14T00:46:07+00:00"
-        },
-        {
-            "name": "nawarian/raylib-ffi",
-            "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/nawarian/raylib-ffi.git",
-                "reference": "a3b5b45026835bbc80217cb8bfee88749fac8f53"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/nawarian/raylib-ffi/zipball/a3b5b45026835bbc80217cb8bfee88749fac8f53",
-                "reference": "a3b5b45026835bbc80217cb8bfee88749fac8f53",
-                "shasum": ""
-            },
-            "require": {
-                "ext-ffi": "^7.4|^8.0",
-                "php": "^7.4|^8.0",
-                "webmozart/assert": "^1.10"
-            },
-            "require-dev": {
-                "captainhook/captainhook": "^5.4",
-                "captainhook/plugin-composer": "^5.2",
-                "phpspec/prophecy-phpunit": "^2.0",
-                "phpunit/phpunit": "^9.5",
-                "squizlabs/php_codesniffer": "^3.5",
-                "vimeo/psalm": "^4.7"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Nawarian\\Raylib\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Nawarian\\Tests\\Raylib\\": "tests/"
-                }
-            },
-            "scripts": {
-                "phpunit": [
-                    "phpunit"
-                ],
-                "phpcs": [
-                    "phpcs --standard=PSR12 -s src/ examples/"
-                ],
-                "psalm": [
-                    "psalm"
-                ],
-                "checks": [
-                    "@psalm",
-                    "@phpcs",
-                    "@phpunit"
-                ]
-            },
-            "license": [
-                "GPL-3-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "Nawarian",
-                    "email": "nickolas@phpsp.org.br"
-                }
-            ],
-            "description": "Raylib bindings for PHP using FFI",
-            "support": {
-                "source": "https://github.com/nawarian/raylib-ffi/tree/main",
-                "issues": "https://github.com/nawarian/raylib-ffi/issues"
-            },
-            "time": "2021-05-21T17:13:47+00:00"
         },
         {
             "name": "opis/closure",
@@ -384,6 +314,78 @@
                 "psr"
             ],
             "time": "2021-03-05T17:36:06+00:00"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "nawarian/raylib-ffi",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nawarian/raylib-ffi.git",
+                "reference": "5d964e9c918d656f5a7a29d6456396b893429ea2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nawarian/raylib-ffi/zipball/5d964e9c918d656f5a7a29d6456396b893429ea2",
+                "reference": "5d964e9c918d656f5a7a29d6456396b893429ea2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-ffi": "^7.4|^8.0",
+                "php": "^7.4|^8.0",
+                "webmozart/assert": "^1.10"
+            },
+            "require-dev": {
+                "captainhook/captainhook": "^5.4",
+                "captainhook/plugin-composer": "^5.2",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.5",
+                "vimeo/psalm": "^4.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Nawarian\\Raylib\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Nawarian\\Tests\\Raylib\\": "tests/"
+                }
+            },
+            "scripts": {
+                "phpunit": [
+                    "phpunit"
+                ],
+                "phpcs": [
+                    "phpcs --standard=PSR12 -s src/ examples/"
+                ],
+                "psalm": [
+                    "psalm"
+                ],
+                "checks": [
+                    "@psalm",
+                    "@phpcs",
+                    "@phpunit"
+                ]
+            },
+            "license": [
+                "GPL-3-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Nawarian",
+                    "email": "nickolas@phpsp.org.br"
+                }
+            ],
+            "description": "Raylib bindings for PHP using FFI",
+            "support": {
+                "source": "https://github.com/nawarian/raylib-ffi/tree/main",
+                "issues": "https://github.com/nawarian/raylib-ffi/issues"
+            },
+            "time": "2021-06-12T19:02:34+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -516,13 +518,12 @@
             "time": "2021-03-11T07:08:13+00:00"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "nawarian/raylib-ffi": 20,
         "php-di/php-di": 20,
-        "evenement/evenement": 20
+        "evenement/evenement": 20,
+        "nawarian/raylib-ffi": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
