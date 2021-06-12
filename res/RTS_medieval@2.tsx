@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.4" tiledversion="1.4.2" name="RTS_medieval@2" tilewidth="128" tileheight="128" spacing="64" margin="64" tilecount="126" columns="18">
+<tileset version="1.5" tiledversion="1.6.0" name="RTS_medieval@2" tilewidth="128" tileheight="128" spacing="64" margin="64" tilecount="126" columns="18">
  <image source="kenney_medievalrtspack/Tilesheet/RTS_medieval@2.png" width="3520" height="1408"/>
  <tile id="58" type="RTS\Objects\Tree">
   <properties>
@@ -55,7 +55,7 @@
    <property name="team" type="int" value="0"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="66" type="RTS\Objects\Villager">
@@ -65,28 +65,40 @@
    <property name="team" type="int" value="0"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="67">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="5">
+   <object id="4" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="68">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="69">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="70">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="76" type="RTS\Objects\Stone">
   <properties>
@@ -142,7 +154,7 @@
    <property name="team" type="int" value="1"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="84" type="RTS\Objects\Villager">
@@ -152,28 +164,40 @@
    <property name="team" type="int" value="1"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="85">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="86">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="87">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="88">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="94" type="RTS\Objects\Stone">
   <properties>
@@ -217,7 +241,7 @@
    <property name="team" type="int" value="2"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="102" type="RTS\Objects\Villager">
@@ -227,28 +251,40 @@
    <property name="team" type="int" value="2"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="103">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="104">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="105">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="106">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="112">
   <properties>
@@ -292,7 +328,7 @@
    <property name="team" type="int" value="3"/>
   </properties>
   <objectgroup draworder="index" id="7">
-   <object id="14" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="15" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="120" type="RTS\Objects\Villager">
@@ -302,27 +338,39 @@
    <property name="team" type="int" value="3"/>
   </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="collision" x="48" y="64" width="32" height="24"/>
+   <object id="2" type="collision" x="48" y="48" width="32" height="40"/>
   </objectgroup>
  </tile>
  <tile id="121">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="122">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="123">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
  <tile id="124">
   <properties>
    <property name="selected" value="false"/>
   </properties>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="collision" x="48" y="48" width="32" height="40"/>
+  </objectgroup>
  </tile>
 </tileset>
