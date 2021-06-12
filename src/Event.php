@@ -25,6 +25,9 @@ class Event
     public const LOOP_UPDATE = 'loop.update';
     public const COMMAND_DISPATCH = 'command.dispatch';
     public const COMMAND_MOVE = 'command.move';
+    public const MOUSE_AREA_SELECTED = 'mouse.area_selected';
+    public const MOUSE_CLICK_LEFT = 'mouse.click.left';
+    public const MOUSE_CLICK_RIGHT = 'mouse.click.right';
 
     private static ?EventEmitterInterface $instance = null;
 

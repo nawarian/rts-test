@@ -21,16 +21,23 @@ final class TestScene implements Scene
 
     private UnitFactory $unitFactory;
     private ConsoleScene $console;
+    private MouseScene $mouse;
 
-    public function __construct(UnitFactory $unitFactory, ConsoleScene $console)
-    {
+    public function __construct(
+        UnitFactory $unitFactory,
+        ConsoleScene $console,
+        MouseScene $mouse
+    ) {
         $this->unitFactory = $unitFactory;
         $this->console = $console;
+        $this->mouse = $mouse;
     }
 
     public function create(): void
     {
         $this->console->create();
+        $this->mouse->create();
+
         GameState::$camera = new Camera2D(
             new Vector2(0, 0),
             new Vector2(0, 0),
@@ -53,6 +60,7 @@ final class TestScene implements Scene
     public function update(): void
     {
         $this->console->update();
+        $this->mouse->update();
         $r = GameState::$raylib;
 
         if (GameState::$typing) {
@@ -102,8 +110,8 @@ final class TestScene implements Scene
 
         $r->beginMode2D(GameState::$camera);
             $this->drawMap();
-            $this->drawCursor();
         $r->endMode2D();
+        $this->mouse->draw();
 
         // Draw debug stats
         if (GameState::$debug) {
@@ -197,12 +205,5 @@ final class TestScene implements Scene
                 );
             }
         }
-    }
-
-    private function drawCursor(): void
-    {
-        $cursor = GameState::$raylib->getScreenToWorld2D(GameState::$raylib->getMousePosition(), GameState::$camera);
-        $highlight = GameState::$grid->cellByWorldCoords((int) $cursor->x, (int) $cursor->y);
-        GameState::$raylib->drawRectangleRec($highlight->rec, Color::orange(100));
     }
 }

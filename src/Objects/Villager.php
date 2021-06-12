@@ -36,6 +36,18 @@ class Villager extends Unit
         $this->waypoints = new SplPriorityQueue();
 
         Event::on(Event::COMMAND_MOVE, [$this, 'handleMoveCommand']);
+        Event::on(Event::MOUSE_AREA_SELECTED, [$this, 'handleAreaSelected']);
+    }
+
+    public function handleAreaSelected(Rectangle $area): void
+    {
+        $cell = GameState::$grid->cell((int) $this->pos->x, (int) $this->pos->y);
+
+        if (GameState::$raylib->checkCollisionRecs($cell->rec, $area)) {
+            $this->select();
+        } else {
+            $this->deselect();
+        }
     }
 
     public function handleMoveCommand(int $x, int $y): void
