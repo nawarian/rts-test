@@ -40,37 +40,37 @@
  <objectgroup id="2" name="Objects">
   <object id="39" gid="120" x="384" y="256" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="40" gid="120" x="512" y="384" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="41" gid="120" x="512" y="256" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="42" gid="120" x="384" y="384" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="43" gid="120" x="128" y="256" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="44" gid="120" x="256" y="256" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="45" gid="120" x="256" y="384" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="46" gid="120" x="384" y="512" width="128" height="128">
@@ -80,7 +80,7 @@
   </object>
   <object id="47" gid="120" x="640" y="256" width="128" height="128">
    <properties>
-    <property name="selected" value="true"/>
+    <property name="selected" value="false"/>
    </properties>
   </object>
   <object id="48" gid="66" x="384" y="768" width="128" height="128"/>
