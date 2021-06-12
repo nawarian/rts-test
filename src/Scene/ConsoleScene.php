@@ -31,6 +31,10 @@ class ConsoleScene implements Scene
             case '/close':
                 GameState::$typing = false;
                 break;
+            case '/d':
+            case '/debug':
+                GameState::$debug = !GameState::$debug;
+                break;
             case '/m':
             case '/move':
                 [$x, $y] = $parts;

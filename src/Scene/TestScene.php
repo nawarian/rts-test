@@ -94,8 +94,6 @@ final class TestScene implements Scene
 
             GameState::$camera->zoom = $zoom;
         }
-
-        GameState::update();
     }
 
     public function draw(): void

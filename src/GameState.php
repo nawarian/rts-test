@@ -16,14 +16,7 @@ final class GameState
     public static Camera2D $camera;
     public static Spritesheet $tileset;
     public static bool $typing = false;
-    public static bool $debug = true;
-
-    public static function update(): void
-    {
-        if (self::$raylib->isKeyPressed(Raylib::KEY_TAB)) {
-            self::$debug = !self::$debug;
-        }
-    }
+    public static bool $debug = false;
 
     public static function add(Unit $unit): void
     {
