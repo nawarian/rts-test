@@ -84,6 +84,21 @@ class MouseScene implements Scene
 
         $cursor = $r->getScreenToWorld2D($r->getMousePosition(), GameState::$camera);
         $highlight = GameState::$grid->cellByWorldCoords((int) $cursor->x, (int) $cursor->y);
-        $r->drawRectangleRec($highlight->rec, Color::orange(100));
+
+        $highlightCoords = $r->getWorldToScreen2D(
+            new Vector2($highlight->rec->x, $highlight->rec->y),
+            GameState::$camera,
+        );
+        $highlightSize = $r->getWorldToScreen2D(
+            new Vector2($highlight->rec->width, $highlight->rec->height),
+            GameState::$camera,
+        );
+        $cursorSquare = new Rectangle(
+            $highlightCoords->x,
+            $highlightCoords->y,
+            $highlightSize->x,
+            $highlightSize->y,
+        );
+        $r->drawRectangleRec($cursorSquare, Color::orange(100));
     }
 }
